@@ -1,0 +1,2651 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Die Kirche</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#c8a84b;--gold2:#e2c97e;--gold3:#8a6d28;--gold-glow:rgba(200,168,75,0.25);--bg:#06050a;--bg1:#0c0b12;--bg2:#111018;--bg3:#17161f;--surface:#1c1b24;--surface2:#222130;--text:#ece8dc;--text2:#b0a890;--text3:#6a6458;--border:rgba(200,168,75,0.12);--border2:rgba(200,168,75,0.3);--border3:rgba(200,168,75,0.5);--red:#e05c5c;--green:#5cbf7a;--blue:#6aaeff;
+/* Seasonal overrides (JS sets these) */
+--season-accent:var(--gold);--season-glow:var(--gold-glow)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0}
+.orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:.12}
+.orb1{width:800px;height:600px;top:-200px;left:-200px;background:radial-gradient(circle,var(--gold) 0%,transparent 70%)}
+.orb2{width:600px;height:600px;bottom:-100px;right:-100px;background:radial-gradient(circle,#4a2a8a 0%,transparent 70%)}
+.orb3{width:400px;height:400px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,var(--gold) 0%,transparent 70%);animation:orb-p 8s ease-in-out infinite}
+@keyframes orb-p{0%,100%{opacity:.06;transform:translate(-50%,-50%) scale(1)}50%{opacity:.14;transform:translate(-50%,-50%) scale(1.3)}}
+
+/* ── LITURGISCHE FARBEN (Evangelisches Kirchenjahr) ── */
+/* Farben werden per JS auf :root gesetzt — alle Akzente folgen --gold */
+#snow-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;display:none}
+body.snow-on #snow-canvas{display:block}
+.season-banner{display:none;padding:.5rem 2.5rem;text-align:center;font-size:.73rem;letter-spacing:.14em;text-transform:uppercase;position:fixed;top:66px;left:0;right:0;z-index:99;background:var(--banner-bg,rgba(0,0,0,.7));border-bottom:1px solid var(--banner-border,var(--border2));color:var(--banner-color,var(--gold))}
+body.has-banner .season-banner{display:block}
+body.has-banner main{padding-top:calc(66px + 34px)}
+/* Orb colors follow --orb1-color and --orb2-color set by JS */
+.orb1{background:radial-gradient(circle,var(--orb1-color,var(--gold)) 0%,transparent 70%) !important}
+.orb2{background:radial-gradient(circle,var(--orb2-color,#4a2a8a) 0%,transparent 70%) !important}
+.orb3{background:radial-gradient(circle,var(--orb3-color,var(--gold)) 0%,transparent 70%) !important}
+.kirchenjahr-widget{display:flex;align-items:center;gap:1.2rem;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:1.1rem 1.6rem;margin:2rem auto 0;max-width:560px}
+.kj-icon{font-size:2rem;line-height:1}
+.kj-season{font-family:'Cinzel',serif;font-size:.9rem;font-weight:600;color:var(--gold);margin-bottom:.2rem}
+.kj-desc{font-size:.75rem;color:var(--text2);line-height:1.5}
+.kb-item{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.9rem 1.3rem;margin-bottom:.5rem;transition:border-color .2s}
+.kb-item:hover{border-color:var(--border2)}
+.kb-icon{font-size:1.5rem;text-align:center}
+.kb-info h4{font-family:'Cinzel',serif;font-size:.88rem;font-weight:600;margin-bottom:.18rem}
+.kb-info .kb-meta{font-size:.75rem;color:var(--text2);display:flex;gap:.7rem;flex-wrap:wrap}
+.kb-info .kb-note{font-size:.72rem;color:var(--text3);margin-top:.15rem;font-style:italic}
+.kb-type{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;padding:.22rem .65rem;border-radius:3px;white-space:nowrap}
+.kb-taufe   {background:rgba(106,174,255,.1);color:var(--blue);border:1px solid rgba(106,174,255,.2)}
+.kb-hochzeit{background:rgba(200,168,75,.1);color:var(--gold);border:1px solid rgba(200,168,75,.22)}
+.kb-beerdigung{background:rgba(90,84,72,.18);color:var(--text3);border:1px solid var(--border)}
+.kb-empty{text-align:center;padding:4rem;color:var(--text3);font-style:italic;font-family:'Crimson Pro',serif;font-size:1.05rem}
+
+/* ── GLOCKEN ANIMATION ── */
+.bell-wrap{display:flex;align-items:center;gap:5px;opacity:0;pointer-events:none;transition:opacity .5s;margin-left:.4rem}
+.bell-wrap.visible{opacity:1;pointer-events:auto}
+.bell-icon{font-size:1.15rem;filter:drop-shadow(0 0 8px var(--gold-glow));cursor:pointer;transition:transform .1s;user-select:none}
+.bell-wrap.ringing .bell-icon{animation:bell-swing .4s ease-in-out infinite}
+@keyframes bell-swing{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(18deg)}}
+.bell-lbl{display:none}
+.bell-time-badge{font-size:.62rem;background:rgba(200,168,75,.12);border:1px solid var(--border2);border-radius:8px;padding:.15rem .5rem;color:var(--gold);letter-spacing:.04em}
+.live-clock{font-family:'Cinzel',serif;font-size:.78rem;font-weight:600;letter-spacing:.1em;color:var(--text2);padding:.28rem .7rem;border:1px solid var(--border);border-radius:5px;background:rgba(255,255,255,.03);min-width:62px;text-align:center;transition:color .2s}
+.live-clock:hover{color:var(--gold);border-color:var(--border2)}
+
+/* HEADER */
+header{position:fixed;top:0;left:0;right:0;z-index:100;height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;background:rgba(6,5,10,.82);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:11px;cursor:pointer;text-decoration:none}
+.logo-sym{font-size:1.4rem;color:var(--gold);filter:drop-shadow(0 0 8px var(--gold-glow))}
+.logo-txt{font-family:'Cinzel',serif;font-size:1rem;font-weight:600;letter-spacing:.14em;color:var(--text)}
+nav{display:flex;align-items:center;gap:.05rem;flex-wrap:wrap}
+nav a,nav button{background:none;border:none;font-family:'DM Sans',sans-serif;font-weight:400;font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--text2);padding:.45rem .8rem;border-radius:5px;cursor:pointer;transition:all .2s;text-decoration:none;white-space:nowrap}
+nav a:hover,nav button:hover,nav a.active{color:var(--gold);background:rgba(200,168,75,.07)}
+.n-login{border:1px solid var(--border2) !important;color:var(--gold) !important;margin-left:.7rem}
+.n-login:hover{background:rgba(200,168,75,.12) !important}
+.n-logout{border:1px solid rgba(224,92,92,.25) !important;color:rgba(224,92,92,.65) !important;margin-left:.25rem}
+.n-logout:hover{border-color:var(--red) !important;color:var(--red) !important}
+.role-chip{display:none;align-items:center;gap:6px;font-size:.69rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);padding:.28rem .8rem;border:1px solid var(--border2);border-radius:100px;margin-left:.5rem}
+.role-chip.on{display:flex}
+.rdot{width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold)}
+
+/* MAIN */
+main{position:relative;z-index:1;padding-top:66px;min-height:100vh}
+.page{display:none}
+.page.active{display:block;animation:fi .35s ease}
+@keyframes fi{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO */
+.hero{min-height:calc(100vh - 66px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;position:relative;overflow:hidden}
+.hero-pre{font-size:.68rem;letter-spacing:.25em;text-transform:uppercase;color:var(--text3);margin-bottom:1.5rem}
+.cross-wrap{position:relative;margin-bottom:2rem}
+.cross-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid;transform:translate(-50%,-50%);pointer-events:none}
+.cr1{width:220px;height:220px;border-color:var(--border2);animation:rs 22s linear infinite}
+.cr1::before{content:'✦';position:absolute;top:-8px;left:50%;transform:translateX(-50%);color:var(--gold);font-size:.65rem}
+.cr2{width:320px;height:320px;border-color:rgba(200,168,75,.06);animation:rs 38s linear infinite reverse}
+@keyframes rs{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.hero-cross{font-size:clamp(9rem,20vw,16rem);color:var(--gold);line-height:1;filter:drop-shadow(0 0 70px rgba(200,168,75,.55));animation:cp 4.5s ease-in-out infinite;display:block;user-select:none}
+@keyframes cp{0%,100%{filter:drop-shadow(0 0 60px rgba(200,168,75,.5));transform:scale(1)}50%{filter:drop-shadow(0 0 110px rgba(200,168,75,.85));transform:scale(1.025)}}
+.hero h1{font-family:'Cinzel',serif;font-size:clamp(2.8rem,7vw,5.5rem);font-weight:700;letter-spacing:.06em;line-height:1;margin-bottom:.7rem}
+.hero h1 span{color:var(--gold)}
+.hero-tag{font-family:'Crimson Pro',serif;font-size:clamp(1.05rem,2vw,1.45rem);font-style:italic;color:var(--text2);margin-bottom:2rem;line-height:1.6}
+.hero-div{width:90px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:.4rem auto 1.8rem}
+.daily-verse-box{max-width:560px;margin:0 auto;background:rgba(200,168,75,.04);border:1px solid var(--border2);border-radius:10px;padding:1.5rem 2rem;position:relative}
+.daily-verse-box::before{content:'❝';position:absolute;top:.6rem;left:1rem;font-family:'Crimson Pro',serif;font-size:2rem;color:rgba(200,168,75,.18);line-height:1}
+.dv-label{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem}
+.dv-text{font-family:'Crimson Pro',serif;font-size:1.08rem;font-style:italic;color:var(--text2);line-height:1.9}
+.dv-ref{font-size:.72rem;color:var(--text3);margin-top:.5rem;letter-spacing:.08em}
+.hero-btns{display:flex;gap:.9rem;margin-top:2.8rem;flex-wrap:wrap;justify-content:center}
+.qcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.9rem;max-width:980px;margin:4rem auto 0;padding:0 2rem;width:100%}
+.qcard{background:rgba(28,27,36,.6);border:1px solid var(--border);border-radius:9px;padding:1.5rem;cursor:pointer;transition:all .28s;backdrop-filter:blur(8px)}
+.qcard:hover{border-color:var(--border2);transform:translateY(-4px);background:rgba(34,33,48,.85)}
+.qcard-ic{font-size:1.6rem;margin-bottom:.8rem}
+.qcard h3{font-family:'Cinzel',serif;font-size:.82rem;font-weight:600;letter-spacing:.07em;margin-bottom:.4rem}
+.qcard p{font-size:.78rem;color:var(--text2);line-height:1.6}
+.stats-section{max-width:980px;margin:3rem auto 0;padding:0 2rem}
+.stats-title{font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:var(--text3);text-align:center;margin-bottom:1.5rem}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}
+.stat-card{background:rgba(28,27,36,.7);border:1px solid var(--border);border-radius:9px;padding:1.4rem;text-align:center;backdrop-filter:blur(8px)}
+.stat-num{font-family:'Cinzel',serif;font-size:2rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:.3rem}
+.stat-lbl{font-size:.72rem;color:var(--text2);letter-spacing:.07em}
+.partners-section{max-width:980px;margin:3.5rem auto 0;padding:0 2rem 5rem}
+.partners-title{font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:var(--text3);text-align:center;margin-bottom:.6rem}
+.partners-div{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold3),transparent);margin:0 auto 1.8rem}
+.partners-grid{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;align-items:center}
+.partner-card{background:rgba(28,27,36,.7);border:1px solid var(--border);border-radius:8px;padding:1rem 1.8rem;display:flex;align-items:center;gap:.8rem;transition:all .25s;backdrop-filter:blur(8px);min-width:160px}
+.partner-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.partner-logo{font-size:1.8rem;line-height:1}
+.partner-name{font-family:'Cinzel',serif;font-size:.78rem;font-weight:600;letter-spacing:.06em}
+.partner-type{font-size:.65rem;color:var(--text3)}
+.no-partners{color:var(--text3);font-style:italic;font-size:.85rem;text-align:center;padding:2rem}
+
+/* BUTTONS */
+.btn{padding:.72rem 2rem;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;transition:all .22s;border:none}
+.btn-gold{background:var(--gold);color:#08070d}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-2px);box-shadow:0 8px 26px rgba(200,168,75,.22)}
+.btn-out{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-out:hover{color:var(--text);border-color:var(--gold);background:rgba(200,168,75,.06)}
+.btn-sm{padding:.45rem 1.15rem;font-size:.7rem}
+.btn-del{background:transparent;color:var(--red);border:1px solid rgba(224,92,92,.28)}
+.btn-del:hover{border-color:var(--red);background:rgba(224,92,92,.07)}
+
+/* SECTION */
+.swrap{max-width:1050px;margin:0 auto;padding:5rem 2.5rem}
+.eyebrow{font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;display:flex;align-items:center;gap:9px}
+.eyebrow::after{content:'';flex:0 0 34px;height:1px;background:var(--gold)}
+.stitle{font-family:'Cinzel',serif;font-size:clamp(1.9rem,4vw,3rem);font-weight:700;line-height:1.1;margin-bottom:.8rem}
+.slead{font-family:'Crimson Pro',serif;font-size:1.12rem;font-style:italic;color:var(--text2);max-width:580px;line-height:1.8}
+
+/* ÜBER */
+.txt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2.5rem;margin:2.5rem 0}
+.txt-block h3{font-family:'Cinzel',serif;font-size:.82rem;font-weight:600;color:var(--gold);letter-spacing:.12em;margin-bottom:.9rem}
+.txt-block p{font-size:.87rem;color:var(--text2);line-height:1.9}
+.hier-title{font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin:2.5rem 0 1rem;display:flex;align-items:center;gap:8px}
+.hier-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.hier-list{display:flex;flex-direction:column;gap:.45rem}
+.hier-item{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:1rem;padding:1rem 1.4rem;background:var(--surface);border:1px solid var(--border);border-radius:7px;transition:border-color .2s}
+.hier-item:hover{border-color:var(--border2)}
+.hi-num{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;color:var(--gold3);text-align:center}
+.hi-info h4{font-family:'Cinzel',serif;font-size:.88rem;font-weight:600;margin-bottom:.2rem}
+.hi-info p{font-size:.78rem;color:var(--text2)}
+.badge{display:inline-block;font-size:.63rem;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .58rem;border-radius:3px;font-weight:600}
+.b-gold{background:rgba(200,168,75,.12);color:var(--gold);border:1px solid rgba(200,168,75,.25)}
+.b-blue{background:rgba(106,174,255,.1);color:var(--blue);border:1px solid rgba(106,174,255,.2)}
+.b-green{background:rgba(92,191,122,.1);color:var(--green);border:1px solid rgba(92,191,122,.22)}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin-top:1.2rem}
+.team-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1.4rem;text-align:center;transition:all .22s}
+.team-card:hover{border-color:var(--border2);transform:translateY(-3px)}
+.t-av{width:52px;height:52px;border-radius:50%;background:var(--surface2);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin:0 auto .9rem}
+.t-name{font-family:'Cinzel',serif;font-size:.87rem;font-weight:600;margin-bottom:.25rem}
+.t-role{font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--gold)}
+
+/* ARBEIT */
+.work-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-top:2.5rem}
+.wc{background:var(--surface);padding:1.8rem;transition:background .2s}
+.wc:hover{background:var(--surface2)}
+.wc-n{font-family:'Cinzel',serif;font-size:2rem;font-weight:900;color:rgba(200,168,75,.16);margin-bottom:.5rem}
+.wc-t{font-family:'Cinzel',serif;font-size:.95rem;font-weight:600;margin-bottom:.45rem}
+.wc-d{font-size:.83rem;color:var(--text2);line-height:1.7}
+.wc-tag{display:inline-block;margin-top:.7rem;font-size:.64rem;letter-spacing:.09em;text-transform:uppercase;padding:.18rem .6rem;border:1px solid var(--border);border-radius:3px;color:var(--text3)}
+
+/* PROJEKTE */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.4rem;margin-top:2.5rem}
+.proj-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1.8rem;transition:all .28s;position:relative;overflow:hidden}
+.proj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold3));opacity:0;transition:opacity .3s}
+.proj-card:hover{border-color:var(--border2);transform:translateY(-3px)}
+.proj-card:hover::before{opacity:1}
+.pc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;margin-bottom:.9rem}
+.pc-ic{font-size:1.4rem}
+.pc-st{font-size:.64rem;letter-spacing:.09em;text-transform:uppercase;padding:.22rem .6rem;border-radius:3px}
+.s-aktiv{background:rgba(92,191,122,.1);color:var(--green);border:1px solid rgba(92,191,122,.22)}
+.s-geplant{background:rgba(200,168,75,.1);color:var(--gold);border:1px solid rgba(200,168,75,.2)}
+.s-abgeschlossen{background:rgba(90,84,72,.15);color:var(--text3);border:1px solid var(--border)}
+.pc-title{font-family:'Cinzel',serif;font-size:.95rem;font-weight:600;margin-bottom:.55rem}
+.pc-desc{font-size:.82rem;color:var(--text2);line-height:1.7;margin-bottom:.9rem}
+.pc-goal{font-size:.76rem;color:var(--text3);display:flex;align-items:center;gap:6px;padding:.55rem .85rem;background:rgba(255,255,255,.028);border-radius:5px;border:1px solid var(--border)}
+.pc-goal::before{content:'🎯';font-size:.8rem}
+
+/* GOTTESDIENST */
+.p-filter{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1.8rem}
+.pfbtn{background:none;border:1px solid var(--border);border-radius:100px;padding:.36rem .95rem;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.pfbtn:hover{border-color:var(--border2);color:var(--text2)}
+.pfbtn.on{border-color:var(--gold);color:var(--gold);background:rgba(200,168,75,.07)}
+.p-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.4rem}
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1.8rem;transition:border-color .2s;position:relative}
+.pcard:hover{border-color:var(--border2)}
+.p-cat{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.7rem}
+.p-title{font-family:'Cinzel',serif;font-size:.95rem;font-weight:600;margin-bottom:.9rem}
+.p-text{font-family:'Crimson Pro',serif;font-size:1.03rem;font-style:italic;color:var(--text2);line-height:2}
+.p-src{margin-top:1rem;font-size:.72rem;color:var(--text3);display:flex;align-items:center;gap:5px}
+.p-src::before{content:'—'}
+.p-qm{position:absolute;top:.9rem;right:1.1rem;font-family:'Crimson Pro',serif;font-size:2.2rem;color:rgba(200,168,75,.12);line-height:1}
+
+/* KALENDER */
+.cal-upcoming{margin-top:2.5rem}
+.cal-upcoming-title{font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;display:flex;align-items:center;gap:8px}
+.cal-upcoming-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.cal-ev-big{display:flex;flex-direction:column;gap:.75rem}
+.cev-big{display:grid;grid-template-columns:80px 1fr auto;align-items:center;gap:1.2rem;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1.1rem 1.4rem;transition:border-color .22s}
+.cev-big:hover{border-color:var(--border2)}
+.cev-date-box{text-align:center;background:rgba(200,168,75,.06);border:1px solid var(--border2);border-radius:7px;padding:.5rem .3rem}
+.cev-day{font-family:'Cinzel',serif;font-size:1.6rem;font-weight:700;color:var(--gold);line-height:1}
+.cev-mon{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-top:.1rem}
+.cev-info h4{font-family:'Cinzel',serif;font-size:.92rem;font-weight:600;margin-bottom:.22rem}
+.cev-info .cev-meta{font-size:.77rem;color:var(--text2);display:flex;align-items:center;gap:.9rem;flex-wrap:wrap}
+.cev-info .cev-desc-text{font-size:.78rem;color:var(--text3);margin-top:.25rem;line-height:1.5}
+.cev-type-badge{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:.22rem .65rem;border-radius:3px;white-space:nowrap}
+.cev-recur{font-size:.62rem;color:var(--text3);display:flex;align-items:center;gap:4px;margin-top:.15rem}
+.no-events{text-align:center;padding:4rem;color:var(--text3);font-style:italic;font-family:'Crimson Pro',serif;font-size:1.05rem}
+
+/* ── NEUIGKEITEN / BULLETIN ── */
+.news-grid{display:flex;flex-direction:column;gap:1.2rem;margin-top:2.5rem}
+.news-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1.8rem;transition:all .25s;position:relative;overflow:hidden}
+.news-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--gold3),var(--gold));opacity:0;transition:opacity .3s}
+.news-card:hover{border-color:var(--border2)}
+.news-card:hover::before{opacity:1}
+.news-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.9rem}
+.news-meta{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.news-date{font-size:.68rem;color:var(--text3);letter-spacing:.08em}
+.news-author{font-size:.68rem;color:var(--gold);letter-spacing:.06em}
+.news-pin{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;padding:.18rem .55rem;border-radius:3px;background:rgba(200,168,75,.1);color:var(--gold);border:1px solid rgba(200,168,75,.22)}
+.news-title{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:600;margin-bottom:.65rem}
+.news-body{font-size:.85rem;color:var(--text2);line-height:1.9}
+.news-empty{text-align:center;padding:4rem;color:var(--text3);font-style:italic;font-family:'Crimson Pro',serif;font-size:1.05rem}
+
+/* ── GALERIE ── */
+.gallery-filter{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1.8rem;margin-top:2rem}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-top:1rem}
+.gal-item{background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;transition:all .28s;cursor:pointer;position:relative;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+.gal-item:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.gal-emoji{font-size:3.5rem;opacity:.35}
+.gal-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(6,5,10,.92));display:flex;flex-direction:column;justify-content:flex-end;padding:1rem;opacity:0;transition:opacity .25s}
+.gal-item:hover .gal-overlay{opacity:1}
+.gal-title{font-family:'Cinzel',serif;font-size:.82rem;font-weight:600;margin-bottom:.2rem}
+.gal-cat{font-size:.62rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.gal-tag{position:absolute;top:.7rem;left:.7rem;font-size:.6rem;letter-spacing:.09em;text-transform:uppercase;padding:.18rem .5rem;border-radius:3px;background:rgba(6,5,10,.7);color:var(--text2);border:1px solid var(--border)}
+.gal-empty{text-align:center;padding:4rem;color:var(--text3);font-style:italic;font-family:'Crimson Pro',serif;font-size:1.05rem}
+/* Lightbox */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:800;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
+.lightbox.on{display:flex}
+.lb-emoji{font-size:8rem}
+.lb-info{text-align:center}
+.lb-info h3{font-family:'Cinzel',serif;font-size:1.2rem;margin-bottom:.4rem}
+.lb-info p{font-size:.83rem;color:var(--text2)}
+.lb-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:.9rem;padding:.5rem .8rem;cursor:pointer;transition:all .2s}
+.lb-close:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── MESSINTENTIONEN ── */
+.mint-grid{display:flex;flex-direction:column;gap:.65rem;margin-top:2rem}
+.mint-item{display:grid;grid-template-columns:90px 1fr auto;align-items:center;gap:1.2rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.4rem;transition:border-color .2s}
+.mint-item:hover{border-color:var(--border2)}
+.mint-date-box{text-align:center;background:rgba(200,168,75,.05);border:1px solid var(--border2);border-radius:6px;padding:.4rem .3rem}
+.mint-day{font-family:'Cinzel',serif;font-size:1.3rem;font-weight:700;color:var(--gold);line-height:1}
+.mint-mon{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.mint-info h4{font-family:'Cinzel',serif;font-size:.88rem;font-weight:600;margin-bottom:.2rem}
+.mint-info .mint-sub{font-size:.77rem;color:var(--text2)}
+.mint-info .mint-req{font-size:.7rem;color:var(--text3);margin-top:.15rem;font-style:italic}
+.mint-status{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;padding:.22rem .6rem;border-radius:3px;white-space:nowrap}
+.ms-offen{background:rgba(200,168,75,.1);color:var(--gold);border:1px solid rgba(200,168,75,.22)}
+.ms-gehalten{background:rgba(92,191,122,.1);color:var(--green);border:1px solid rgba(92,191,122,.22)}
+.ms-storniert{background:rgba(90,84,72,.15);color:var(--text3);border:1px solid var(--border)}
+.mint-empty{text-align:center;padding:4rem;color:var(--text3);font-style:italic;font-family:'Crimson Pro',serif;font-size:1.05rem}
+
+/* SPENDEN */
+.don-lay{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:3rem;align-items:start;margin-top:3rem}
+.don-text h3{font-family:'Cinzel',serif;font-size:1.3rem;font-weight:600;margin-bottom:.9rem}
+.don-text p{font-size:.87rem;color:var(--text2);line-height:1.9;margin-bottom:.9rem}
+.don-verse{margin-top:1.8rem;padding:1.3rem;border-left:2px solid var(--gold3)}
+.don-verse p{font-family:'Crimson Pro',serif;font-size:1.05rem;font-style:italic;color:var(--text2);line-height:1.9}
+.don-verse span{font-size:.72rem;color:var(--text3);display:block;margin-top:.45rem;letter-spacing:.1em;text-transform:uppercase}
+
+/* ── DASHBOARD ── */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.dash-kpi{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1.4rem;text-align:center;transition:border-color .2s}
+.dash-kpi:hover{border-color:var(--border2)}
+.dash-kpi-num{font-family:'Cinzel',serif;font-size:2.2rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:.3rem}
+.dash-kpi-lbl{font-size:.72rem;color:var(--text2);letter-spacing:.07em}
+.dash-kpi-icon{font-size:1.2rem;margin-bottom:.5rem}
+.dash-row{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem}
+.dash-box{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1.5rem}
+.dash-box h3{font-family:'Cinzel',serif;font-size:.82rem;font-weight:600;color:var(--gold);letter-spacing:.1em;margin-bottom:1.2rem;display:flex;align-items:center;gap:7px}
+.dash-ev-item{display:flex;align-items:center;gap:.9rem;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.dash-ev-item:last-child{border-bottom:none}
+.dash-ev-day{font-family:'Cinzel',serif;font-size:1.1rem;font-weight:700;color:var(--gold);min-width:28px}
+.dash-ev-info{font-size:.78rem;color:var(--text2)}
+.dash-ev-type{font-size:.62rem;color:var(--text3)}
+.dash-log-item{display:flex;gap:.8rem;padding:.5rem 0;border-bottom:1px solid var(--border);font-size:.75rem}
+.dash-log-item:last-child{border-bottom:none}
+.dash-log-time{color:var(--text3);white-space:nowrap;min-width:75px}
+.dash-log-actor{color:var(--gold);min-width:70px}
+.dash-log-act{color:var(--text2);flex:1}
+.dash-empty{color:var(--text3);font-style:italic;font-size:.8rem;padding:.5rem 0}
+
+/* MODAL / OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);z-index:500;align-items:center;justify-content:center}
+.overlay.on{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:2.8rem;width:420px;max-width:95vw;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.5);max-height:90vh;overflow-y:auto}
+.m-close{position:absolute;top:.9rem;right:.9rem;background:none;border:none;color:var(--text3);font-size:1.05rem;cursor:pointer;width:32px;height:32px;border-radius:5px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.m-close:hover{color:var(--text);background:var(--surface)}
+.m-cross{font-size:2.8rem;text-align:center;color:var(--gold);filter:drop-shadow(0 0 18px var(--gold-glow));margin-bottom:.7rem}
+.modal h2{font-family:'Cinzel',serif;font-size:1.7rem;font-weight:700;text-align:center;margin-bottom:.25rem}
+.m-sub{text-align:center;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:2.3rem}
+.fg{margin-bottom:1rem}
+.fg label{display:block;font-size:.67rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:.4rem}
+.fg input,.fg select,.fg textarea{width:100%;padding:.68rem .95rem;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.87rem;transition:border-color .2s;outline:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--border3)}
+.fg select option{background:var(--bg2)}
+.fg textarea{resize:vertical;min-height:85px;line-height:1.6}
+.f-err{font-size:.76rem;color:var(--red);margin-top:.35rem;display:none;align-items:center;gap:4px}
+.f-err.on{display:flex}
+.f-ok{font-size:.76rem;color:var(--green);align-items:center;gap:4px;display:none}
+.f-ok.on{display:flex}
+
+/* ADMIN */
+.adm-wrap{display:grid;grid-template-columns:225px 1fr;min-height:calc(100vh - 66px)}
+.adm-side{background:var(--bg1);border-right:1px solid var(--border);padding:1.8rem 0;overflow-y:auto}
+.adm-slbl{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);padding:.45rem 1.4rem;margin-bottom:.25rem;margin-top:.5rem}
+.adm-side a{display:flex;align-items:center;gap:8px;padding:.6rem 1.4rem;font-size:.8rem;color:var(--text2);cursor:pointer;transition:all .18s;border-left:2px solid transparent;text-decoration:none}
+.adm-side a:hover{color:var(--text);background:rgba(255,255,255,.022)}
+.adm-side a.on{color:var(--gold);background:rgba(200,168,75,.07);border-left-color:var(--gold)}
+.adm-main{padding:2.8rem;overflow-y:auto}
+.adm-panel{display:none}
+.adm-panel.on{display:block;animation:fi .28s ease}
+.adm-ph{margin-bottom:2.2rem}
+.adm-ph h2{font-family:'Cinzel',serif;font-size:1.7rem;font-weight:700;margin-bottom:.25rem}
+.adm-ph p{font-size:.82rem;color:var(--text3)}
+.pg-sel{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.7rem;margin-bottom:1.8rem}
+.pg-btn{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:1.1rem 1.3rem;cursor:pointer;transition:all .18s;text-align:left}
+.pg-btn:hover{border-color:var(--border2);background:var(--surface2)}
+.pg-btn.sel{border-color:var(--gold);background:rgba(200,168,75,.06)}
+.pgb-ic{font-size:1.2rem;margin-bottom:.4rem}
+.pgb-n{font-family:'Cinzel',serif;font-size:.78rem;font-weight:600;letter-spacing:.05em;margin-bottom:.15rem}
+.pgb-d{font-size:.68rem;color:var(--text3)}
+.esurf{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1.8rem}
+.esurf h3{font-family:'Cinzel',serif;font-size:1rem;font-weight:600;color:var(--gold);margin-bottom:1.4rem;display:flex;align-items:center;gap:7px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.9rem}
+.save-row{display:flex;align-items:center;gap:.9rem;margin-top:1.4rem;flex-wrap:wrap}
+.tw{background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:1.4rem}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding:.85rem 1.1rem;border-bottom:1px solid var(--border);background:var(--bg2)}
+td{padding:.85rem 1.1rem;font-size:.83rem;border-bottom:1px solid var(--border);color:var(--text2)}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .14s}
+tbody tr:hover td{background:rgba(255,255,255,.012)}
+.hai{display:grid;grid-template-columns:28px 1fr auto auto auto;align-items:center;gap:.7rem;padding:.8rem 1.1rem;background:var(--surface);border:1px solid var(--border);border-radius:7px;margin-bottom:.4rem}
+.hai-n{font-family:'Cinzel',serif;font-weight:700;color:var(--gold3);text-align:center;font-size:.9rem}
+.hai-i h4{font-family:'Cinzel',serif;font-size:.85rem;font-weight:600}
+.hai-i span{font-size:.73rem;color:var(--text3)}
+.ibtn{width:26px;height:26px;background:none;border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:.7rem;transition:all .18s}
+.ibtn:hover{border-color:var(--border2);color:var(--text)}
+.ibtn.del:hover{border-color:rgba(224,92,92,.38);color:var(--red)}
+
+/* AKTIVITÄTSLOG */
+.log-list{display:flex;flex-direction:column;gap:.4rem;max-height:420px;overflow-y:auto}
+.log-item{display:flex;align-items:flex-start;gap:.8rem;padding:.7rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:.78rem}
+.log-time{color:var(--text3);white-space:nowrap;font-size:.7rem;min-width:120px}
+.log-actor{color:var(--gold);font-weight:500;min-width:80px}
+.log-action{color:var(--text2);flex:1}
+.log-empty{color:var(--text3);font-style:italic;padding:1.5rem;text-align:center;font-size:.83rem}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.8rem;right:1.8rem;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;padding:.85rem 1.4rem;font-size:.83rem;z-index:9998;transform:translateY(70px);opacity:0;transition:all .32s;pointer-events:none;display:flex;align-items:center;gap:7px}
+.toast.on{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(92,191,122,.28);color:var(--green)}
+.toast.err{border-color:rgba(224,92,92,.28);color:var(--red)}
+
+/* PASS TOGGLE */
+.pass-wrap{position:relative}
+.pass-wrap input{padding-right:2.5rem}
+.pass-toggle{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:.85rem;padding:.2rem}
+.pass-toggle:hover{color:var(--text)}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+
+@media(max-width:768px){
+  .adm-wrap{grid-template-columns:1fr}
+  .adm-side{display:none}
+  .dash-row{grid-template-columns:1fr}
+  .cev-big{grid-template-columns:60px 1fr}
+  .cev-type-badge{display:none}
+  header{padding:0 1rem}
+  nav a[data-p]{display:none}
+  nav a[data-p="start"],nav a[data-p="admin"]{display:block}
+}
+
+/* ── COUNTDOWN ── */
+.countdown-wrap{
+  position:relative;margin-bottom:3rem;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:2px;
+  overflow:hidden;
+}
+/* corner ornaments */
+.countdown-wrap::before,.countdown-wrap::after{
+  content:'';position:absolute;width:18px;height:18px;
+  border-color:var(--gold);border-style:solid;opacity:.6;
+}
+.countdown-wrap::before{top:10px;left:10px;border-width:1px 0 0 1px}
+.countdown-wrap::after{bottom:10px;right:10px;border-width:0 1px 1px 0}
+.cd-inner{
+  padding:3.5rem 2rem 3rem;
+  text-align:center;position:relative;z-index:1;
+}
+/* top ruled line */
+.cd-rule{display:flex;align-items:center;justify-content:center;gap:.8rem;margin-bottom:1.4rem}
+.cd-rule-line{flex:1;max-width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--border2))}
+.cd-rule-line.r{background:linear-gradient(90deg,var(--border2),transparent)}
+.cd-rule-sym{font-size:.7rem;color:var(--gold);letter-spacing:.3em;text-transform:uppercase;opacity:.7}
+.cd-eyebrow{font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem}
+.cd-title{
+  font-family:'Cinzel',serif;
+  font-size:clamp(1.1rem,3vw,1.6rem);
+  font-weight:400;
+  color:var(--text);
+  margin-bottom:.5rem;
+  letter-spacing:.08em;
+}
+.cd-type{
+  display:inline-block;font-size:.6rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gold3);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:.22rem 1.2rem;margin-bottom:2.8rem;
+}
+/* digit panels — each in a parchment card */
+.cd-digits{
+  display:flex;align-items:flex-start;justify-content:center;
+  gap:1.2rem;margin-bottom:2.8rem;flex-wrap:wrap;
+}
+.cd-block{
+  display:flex;flex-direction:column;align-items:center;
+  background:rgba(0,0,0,.25);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:1.1rem 1.6rem .9rem;
+  min-width:74px;
+  position:relative;
+}
+.cd-block::after{
+  content:'';position:absolute;bottom:0;left:15%;right:15%;
+  height:1px;background:linear-gradient(90deg,transparent,var(--gold3),transparent);
+  opacity:.4;
+}
+.cd-num{
+  font-family:'Cinzel',serif;
+  font-size:clamp(2.4rem,5vw,3.8rem);
+  font-weight:700;color:var(--gold);
+  line-height:1;letter-spacing:-.01em;
+  display:block;
+}
+.cd-lbl{
+  font-size:.52rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--text3);
+  margin-top:.55rem;
+}
+.cd-colon{
+  font-family:'Crimson Pro',serif;
+  font-size:2.5rem;font-weight:300;
+  color:var(--border2);
+  margin-top:.6rem;
+  animation:cd-blink 2s ease-in-out infinite;
+  align-self:flex-start;
+}
+@keyframes cd-blink{0%,100%{opacity:.2}50%{opacity:.7}}
+.cd-divider{
+  width:120px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border2),transparent);
+  margin:0 auto 1.2rem;
+}
+.cd-date{
+  font-family:'Crimson Pro',serif;
+  font-style:italic;font-size:1.05rem;
+  color:var(--text2);letter-spacing:.02em;
+}
+.cd-started{
+  font-family:'Crimson Pro',serif;font-size:1.2rem;
+  font-style:italic;color:var(--gold);padding:3rem;
+}
+.cd-empty{
+  font-family:'Crimson Pro',serif;font-size:1rem;
+  font-style:italic;color:var(--text3);padding:3rem;
+}
+</style>
+</head>
+<body>
+<canvas id="snow-canvas"></canvas>
+<div class="ambient"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
+<div class="season-banner" id="seasonBanner">✦ Adventszeit — Bereitet den Weg des Herrn ✦</div>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" onclick="sp('start')"><span class="logo-sym">✝</span><span class="logo-txt">Die Kirche</span></a>
+  <nav id="nav">
+    <a onclick="sp('start')" data-p="start" class="active">Startseite</a>
+    <a onclick="sp('ueber')" data-p="ueber">Über uns</a>
+    <a onclick="sp('arbeit')" data-p="arbeit">Unsere Arbeit</a>
+    <a onclick="sp('projekte')" data-p="projekte">Projekte</a>
+    <a onclick="sp('gottesdienst')" data-p="gottesdienst">Gottesdienst</a>
+    <a onclick="sp('kalender')" data-p="kalender">Kalender</a>
+    <a onclick="sp('neuigkeiten')" data-p="neuigkeiten">Neuigkeiten</a>
+    <a onclick="sp('galerie')" data-p="galerie">Galerie</a>
+    <a onclick="sp('spenden')" data-p="spenden">Spenden</a>
+    <span class="role-chip" id="roleChip"><span class="rdot"></span><span id="rChipTxt"></span></span>
+    <span class="live-clock" id="liveClock"></span>
+    <div class="bell-wrap" id="bellWrap">
+      <span class="bell-icon" id="bellIcon" onclick="toggleBell()" title="Kirchenglocken">🔔</span>
+      <span class="bell-time-badge" id="bellTimeBadge"></span>
+    </div>
+    <button class="btn btn-sm n-login" id="btnLogin" onclick="openModal()">Login</button>
+    <button class="btn btn-sm n-logout" id="btnLogout" onclick="doLogout()" style="display:none">Abmelden</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- STARTSEITE -->
+<div id="page-start" class="page active">
+  <div class="hero">
+    <p class="hero-pre" id="heroPre">Willkommen bei der Kirche</p>
+    <div class="cross-wrap">
+      <div class="cross-ring cr2"></div><div class="cross-ring cr1"></div>
+      <span class="hero-cross">✝</span>
+    </div>
+    <h1><span>Die</span> Kirche</h1>
+    <p class="hero-tag" id="hTag">Licht in der Dunkelheit — Gemeinschaft im Glauben</p>
+    <div class="hero-div"></div>
+    <div class="daily-verse-box">
+      <div class="dv-label">✦ Tagesvers</div>
+      <div class="dv-text" id="dvText"></div>
+      <div class="dv-ref" id="dvRef"></div>
+    </div>
+    <div class="kirchenjahr-widget" id="kjWidget"></div>
+    <div class="hero-btns">
+      <button class="btn btn-gold" onclick="sp('gottesdienst')">Gottesdienste</button>
+      <button class="btn btn-out" onclick="sp('ueber')">Über uns</button>
+    </div>
+    <div class="qcards">
+      <div class="qcard" onclick="sp('ueber')"><div class="qcard-ic">🕊️</div><h3>Gemeinschaft</h3><p>Offen für alle — Glaube verbindet uns.</p></div>
+      <div class="qcard" onclick="sp('gottesdienst')"><div class="qcard-ic">📜</div><h3>Liturgie</h3><p>Gebete, Segen und Zeremonietexte.</p></div>
+      <div class="qcard" onclick="sp('kalender')"><div class="qcard-ic">📅</div><h3>Kalender</h3><p>Gottesdienste, Messen & Veranstaltungen.</p></div>
+      <div class="qcard" onclick="sp('neuigkeiten')"><div class="qcard-ic">📰</div><h3>Neuigkeiten</h3><p>Ankündigungen und Berichte der Kirchenführung.</p></div>
+      <div class="qcard" onclick="sp('galerie')"><div class="qcard-ic">📸</div><h3>Galerie</h3><p>Bilder aus dem Gemeindeleben.</p></div>
+      <div class="qcard" onclick="sp('spenden')"><div class="qcard-ic">🙏</div><h3>Spenden</h3><p>Unterstützt die Arbeit der Kirche.</p></div>
+    </div>
+  </div>
+  <div class="stats-section">
+    <div class="stats-title">✦ Die Kirche in Zahlen</div>
+    <div class="stats-grid" id="statsGrid"></div>
+  </div>
+  <div class="partners-section">
+    <div class="partners-title">✦ Unsere Partner</div>
+    <div class="partners-div"></div>
+    <div class="partners-grid" id="partnersGrid"></div>
+  </div>
+</div>
+
+<!-- ÜBER UNS -->
+<div id="page-ueber" class="page">
+  <div class="swrap">
+    <div class="eyebrow">Die Kirche</div>
+    <div class="stitle">Über uns</div>
+    <p class="slead" id="uLead">Gegründet, um Glauben und Gemeinschaft zu vereinen.</p>
+    <div class="txt-grid">
+      <div class="txt-block"><h3>Mission</h3><p id="uMission">Die Kirche ist mehr als ein Gebäude — sie ist ein Ort der Zuflucht, der Besinnung und der Gemeinschaft. Unsere Türen stehen jedem offen.</p></div>
+      <div class="txt-block"><h3>Werte</h3><p id="uWerte">Barmherzigkeit, Gerechtigkeit und Nächstenliebe sind die Grundpfeiler unseres Handelns. Wir setzen uns für die Schwachen ein.</p></div>
+    </div>
+    <div class="hier-title">Rangordnung</div>
+    <div class="hier-list" id="hierList"></div>
+    <div class="hier-title" style="margin-top:2.5rem">Mitarbeiter</div>
+    <div class="team-grid" id="teamGrid"></div>
+  </div>
+</div>
+
+<!-- ARBEIT -->
+<div id="page-arbeit" class="page">
+  <div class="swrap">
+    <div class="eyebrow">Wirken</div>
+    <div class="stitle">Unsere Arbeit</div>
+    <p class="slead">Was wir täglich für die Gemeinschaft tun.</p>
+    <div class="work-grid">
+      <div class="wc"><div class="wc-n">01</div><div class="wc-t">Seelsorge & Begleitung</div><div class="wc-d">Persönliche Gespräche und spirituelle Unterstützung für alle in schwierigen Zeiten.</div><span class="wc-tag">Täglich</span></div>
+      <div class="wc"><div class="wc-n">02</div><div class="wc-t">Gottesdienste</div><div class="wc-d">Regelmäßige liturgische Feiern mit Gebeten, Lesungen und Gemeinschaftsmomenten.</div><span class="wc-tag">Wöchentlich</span></div>
+      <div class="wc"><div class="wc-n">03</div><div class="wc-t">Bestattungen & Trauerfeiern</div><div class="wc-d">Würdevoller Abschied und Begleitung für Trauernde.</div><span class="wc-tag">Nach Bedarf</span></div>
+      <div class="wc"><div class="wc-n">04</div><div class="wc-t">Hochzeiten & Segnungen</div><div class="wc-d">Feierliche Trauungen und offizielle kirchliche Segnungen für besondere Lebensereignisse.</div><span class="wc-tag">Nach Termin</span></div>
+      <div class="wc"><div class="wc-n">05</div><div class="wc-t">Soziale Hilfe</div><div class="wc-d">Unterstützung bedürftiger Personen durch Spenden und gemeinschaftliche Fürsorge.</div><span class="wc-tag">Fortlaufend</span></div>
+      <div class="wc"><div class="wc-n">06</div><div class="wc-t">Moralische Beratung</div><div class="wc-d">Ethische Orientierung für Einzelpersonen und Institutionen auf Anfrage.</div><span class="wc-tag">Auf Anfrage</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROJEKTE -->
+<div id="page-projekte" class="page">
+  <div class="swrap">
+    <div class="eyebrow">Initiative</div>
+    <div class="stitle">Unsere Projekte</div>
+    <p class="slead">Aktuelle und geplante Vorhaben der Kirchenführung.</p>
+    <div class="proj-grid" id="projGrid"></div>
+    <div id="noProj" style="text-align:center;padding:4rem;color:var(--text3);font-style:italic;font-family:'Crimson Pro',serif;font-size:1.05rem;display:none">Derzeit sind keine Projekte eingetragen.</div>
+  </div>
+</div>
+
+<!-- GOTTESDIENST -->
+<div id="page-gottesdienst" class="page">
+  <div class="swrap">
+    <div class="eyebrow">Liturgie</div>
+    <div class="stitle">Gottesdienst-Texte</div>
+    <p class="slead">Gebete, Segen und Zeremonietexte für kirchliche Anlässe.</p>
+    <div class="p-filter" style="margin-top:2rem">
+      <button class="pfbtn on" onclick="filterP(this,'alle')">Alle</button>
+      <button class="pfbtn" onclick="filterP(this,'gebet')">Gebete</button>
+      <button class="pfbtn" onclick="filterP(this,'segen')">Segen</button>
+      <button class="pfbtn" onclick="filterP(this,'zeremonie')">Zeremonien</button>
+    </div>
+    <div class="p-cards" id="pCards"></div>
+  </div>
+</div>
+
+<!-- KALENDER -->
+<div id="page-kalender" class="page">
+  <div class="swrap">
+    <div class="eyebrow">Termine</div>
+    <div class="stitle">Kirchenkalender</div>
+    <p class="slead">Bevorstehende Gottesdienste, Messen und Veranstaltungen.</p>
+    <div id="countdownBox"></div>
+    <div class="cal-upcoming" id="calUpcoming"></div>
+  </div>
+</div>
+
+<!-- NEUIGKEITEN -->
+<div id="page-neuigkeiten" class="page">
+  <div class="swrap">
+    <div class="eyebrow">Aktuell</div>
+    <div class="stitle">Neuigkeiten</div>
+    <p class="slead">Ankündigungen, Berichte und Mitteilungen der Kirchenführung.</p>
+    <div class="news-grid" id="newsGrid"></div>
+    <div id="newsEmpty" class="news-empty" style="display:none">Noch keine Neuigkeiten veröffentlicht.</div>
+  </div>
+</div>
+
+<!-- GALERIE -->
+<div id="page-galerie" class="page">
+  <div class="swrap">
+    <div class="eyebrow">Archiv</div>
+    <div class="stitle">Galerie</div>
+    <p class="slead">Bilder und Eindrücke aus dem Gemeindeleben.</p>
+    <div class="gallery-filter">
+      <button class="pfbtn on" onclick="filterGal(this,'alle')">Alle</button>
+      <button class="pfbtn" onclick="filterGal(this,'gottesdienst')">Gottesdienste</button>
+      <button class="pfbtn" onclick="filterGal(this,'veranstaltung')">Veranstaltungen</button>
+      <button class="pfbtn" onclick="filterGal(this,'gemeinschaft')">Gemeinschaft</button>
+      <button class="pfbtn" onclick="filterGal(this,'sonstiges')">Sonstiges</button>
+    </div>
+    <div class="gal-grid" id="galGrid"></div>
+    <div id="galEmpty" class="gal-empty" style="display:none">Noch keine Bilder hochgeladen.</div>
+  </div>
+</div>
+
+<!-- MESSINTENTIONEN (öffentlich) -->
+<div id="page-messen" class="page">
+  <div class="swrap">
+    <div class="eyebrow">Liturgie</div>
+    <div class="stitle">Messintentionen</div>
+    <p class="slead">Heilige Messen, die für besondere Anliegen und Personen gefeiert werden.</p>
+    <div class="mint-grid" id="mintPublicGrid"></div>
+    <div id="mintPublicEmpty" class="mint-empty" style="display:none">Derzeit keine Messintentionen eingetragen.</div>
+  </div>
+</div>
+
+<!-- SPENDEN -->
+<div id="page-spenden" class="page">
+  <div class="swrap">
+    <div class="eyebrow">Unterstützung</div>
+    <div class="stitle" id="sTitle">Spenden Erwünscht</div>
+    <div class="don-lay">
+      <div class="don-text">
+        <h3>Helft uns, die Kirche zu erhalten</h3>
+        <p id="sText1">Die Kirche lebt von der Unterstützung ihrer Gemeinschaft. Jede Spende trägt dazu bei, unsere Arbeit fortzuführen — Gottesdienste zu halten, Menschen zu begleiten und Gutes zu tun.</p>
+        <p id="sText2">Wir sind auf die Großzügigkeit unserer Gemeinschaft angewiesen und danken von Herzen für jeden Beitrag.</p>
+        <div class="don-verse">
+          <p>„Gebt, und es wird euch gegeben werden: Ein gutes, gedrücktes, gerütteltes und überfließendes Maß wird man in euren Schoß schütten."</p>
+          <span>Lukas 6,38</span>
+        </div>
+      </div>
+      <div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1.4rem">
+          <h4 style="font-family:'Cinzel',serif;font-size:.85rem;font-weight:600;margin-bottom:.7rem;color:var(--text2)">Verwendung der Spenden</h4>
+          <p style="font-size:.8rem;color:var(--text3);line-height:1.8" id="sVerwendung">Alle Spenden fließen direkt in den Betrieb der Kirche: Gottesdienste, Zeremonien, Gemeinschaftsprojekte. Die Verwaltung liegt beim Vikar und wird vom Priester beaufsichtigt.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="page-admin" class="page">
+  <div class="adm-wrap">
+    <div class="adm-side">
+      <div class="adm-slbl">Übersicht</div>
+      <a onclick="sap('dashboard')" id="as-dashboard" class="on">📊 Dashboard</a>
+      <div class="adm-slbl">Inhalte</div>
+      <a onclick="sap('pages')" id="as-pages">✏️ Seiten bearbeiten</a>
+      <a onclick="sap('prayers')" id="as-prayers">📜 Gebets-Texte</a>
+      <a onclick="sap('projects')" id="as-projects">🎯 Projekte</a>
+      <a onclick="sap('calendar')" id="as-calendar">📅 Kalender</a>
+      <a onclick="sap('news')" id="as-news">📰 Neuigkeiten</a>
+      <a onclick="sap('gallery')" id="as-gallery">📸 Galerie</a>
+      <a onclick="sap('messintentionen')" id="as-messintentionen">🕯️ Messintentionen</a>
+      <a onclick="sap('partners')" id="as-partners">🤝 Partner</a>
+      <div class="adm-slbl">Personen</div>
+      <a onclick="sap('hierarchy')" id="as-hierarchy">⚜️ Rangordnung</a>
+      <a onclick="sap('team')" id="as-team">👥 Mitarbeiter</a>
+      <a onclick="sap('users')" id="as-users">🔑 Benutzer</a>
+      <div class="adm-slbl">Register</div>
+      <a onclick="sap('kirchenbuch')" id="as-kirchenbuch">📜 Kirchenbuch</a>
+      <div class="adm-slbl">System</div>
+      <a onclick="sap('seasonpreview')" id="as-seasonpreview">🎨 Kirchenjahr-Vorschau</a>
+      <a onclick="sap('stats')" id="as-stats">📈 Statistiken</a>
+      <a onclick="sap('log')" id="as-log">👁️ Aktivitätslog</a>
+    </div>
+    <div class="adm-main">
+
+      <!-- DASHBOARD -->
+      <div id="ap-dashboard" class="adm-panel on">
+        <div class="adm-ph"><h2>Dashboard</h2><p>Live-Übersicht der Kirchenverwaltung</p></div>
+        <div class="dash-grid" id="dashKpis"></div>
+        <div class="dash-row">
+          <div class="dash-box">
+            <h3>📅 Nächste Termine</h3>
+            <div id="dashEvents"></div>
+          </div>
+          <div class="dash-box">
+            <h3>👁️ Letzte Aktivitäten</h3>
+            <div id="dashLog"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGES -->
+      <div id="ap-pages" class="adm-panel">
+        <div class="adm-ph"><h2>Seiten bearbeiten</h2><p>Inhalte aller öffentlichen Seiten verwalten</p></div>
+        <div class="pg-sel">
+          <div class="pg-btn" onclick="selPage(this,'start')"><div class="pgb-ic">🏠</div><div class="pgb-n">Startseite</div><div class="pgb-d">Tagline & Vers</div></div>
+          <div class="pg-btn" onclick="selPage(this,'ueber')"><div class="pgb-ic">⛪</div><div class="pgb-n">Über uns</div><div class="pgb-d">Mission & Werte</div></div>
+          <div class="pg-btn" onclick="selPage(this,'spenden')"><div class="pgb-ic">🙏</div><div class="pgb-n">Spenden</div><div class="pgb-d">Spendentext</div></div>
+        </div>
+        <div id="pgEditorForm" style="display:none">
+          <div class="esurf">
+            <h3 id="pgEdTitle">✏️ Bearbeiten</h3>
+            <div id="pgEdFields"></div>
+            <div class="save-row">
+              <button class="btn btn-gold btn-sm" onclick="savePgEdit()">Speichern</button>
+              <button class="btn btn-out btn-sm" onclick="cancelPgEdit()">Abbrechen</button>
+              <span class="f-ok" id="pgSaveOk">✓ Gespeichert</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRAYERS -->
+      <div id="ap-prayers" class="adm-panel">
+        <div class="adm-ph"><h2>Gottesdienst-Texte</h2><p>Liturgische Texte verwalten</p></div>
+        <div class="tw"><table><thead><tr><th>Titel</th><th>Kategorie</th><th>Quelle</th><th></th></tr></thead><tbody id="pTBody"></tbody></table></div>
+        <div class="esurf">
+          <h3>✦ Neuen Text hinzufügen</h3>
+          <div class="frow">
+            <div class="fg"><label>Titel</label><input type="text" id="pTitle" placeholder="Titel"></div>
+            <div class="fg"><label>Kategorie</label><select id="pCat"><option value="gebet">Gebet</option><option value="segen">Segen</option><option value="zeremonie">Zeremonie</option></select></div>
+          </div>
+          <div class="fg"><label>Text</label><textarea id="pText" rows="5" placeholder="Liturgischer Text..."></textarea></div>
+          <div class="fg"><label>Quelle / Anlass</label><input type="text" id="pSrc" placeholder="z.B. Gottesdiensteröffnung"></div>
+          <div class="save-row"><button class="btn btn-gold btn-sm" onclick="addPrayer()">Hinzufügen</button><span class="f-ok" id="pOk">✓ Hinzugefügt</span></div>
+        </div>
+      </div>
+
+      <!-- PROJECTS -->
+      <div id="ap-projects" class="adm-panel">
+        <div class="adm-ph"><h2>Projekte</h2><p>Projekte der Kirchenführung verwalten</p></div>
+        <div id="projAdmList"></div>
+        <div class="esurf">
+          <h3>✦ Neues Projekt erstellen</h3>
+          <div class="frow">
+            <div class="fg"><label>Projekttitel</label><input type="text" id="prTitle" placeholder="Name des Projekts"></div>
+            <div class="fg"><label>Status</label><select id="prStatus"><option value="geplant">Geplant</option><option value="aktiv">Aktiv</option><option value="abgeschlossen">Abgeschlossen</option></select></div>
+          </div>
+          <div class="fg"><label>Beschreibung</label><textarea id="prDesc" rows="3" placeholder="Was ist das Ziel?"></textarea></div>
+          <div class="fg"><label>Projektziel</label><input type="text" id="prGoal" placeholder="z.B. Renovierung bis Ende des Monats"></div>
+          <div class="frow">
+            <div class="fg"><label>Icon (Emoji)</label><input type="text" id="prIcon" placeholder="✝" style="max-width:90px"></div>
+            <div class="fg"><label>Verantwortlich</label><input type="text" id="prOwner" placeholder="Name"></div>
+          </div>
+          <div class="save-row"><button class="btn btn-gold btn-sm" onclick="addProject()">Erstellen</button><span class="f-ok" id="prOk">✓ Erstellt</span></div>
+        </div>
+      </div>
+
+      <!-- CALENDAR -->
+      <div id="ap-calendar" class="adm-panel">
+        <div class="adm-ph"><h2>Kalender verwalten</h2><p>Termine eintragen</p></div>
+        <div id="calAdmList"></div>
+        <div class="esurf" style="margin-top:1rem">
+          <h3>✦ Neuen Termin eintragen</h3>
+          <div class="frow">
+            <div class="fg"><label>Datum</label><input type="date" id="cDate"></div>
+            <div class="fg"><label>Uhrzeit</label><input type="time" id="cTime"></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label>Art</label><select id="cType"><option>Gottesdienst</option><option>Messintention</option><option>Beerdigung</option><option>Hochzeit</option><option>Veranstaltung</option><option>Sonstiges</option></select></div>
+            <div class="fg"><label>Titel</label><input type="text" id="cTitle" placeholder="z.B. Sonntagsmesse"></div>
+          </div>
+          <div class="fg"><label>Beschreibung</label><textarea id="cDesc" rows="3"></textarea></div>
+          <div class="fg"><label>Wiederholung</label>
+            <select id="cRecur"><option value="einmalig">Einmalig</option><option value="täglich">Täglich</option><option value="wöchentlich">Wöchentlich</option><option value="monatlich">Monatlich</option><option value="jährlich">Jährlich</option></select>
+          </div>
+          <div class="save-row"><button class="btn btn-gold btn-sm" onclick="addCalEv()">Eintragen</button><span class="f-ok" id="cOk">✓ Eingetragen</span></div>
+        </div>
+      </div>
+
+      <!-- NEWS ADMIN -->
+      <div id="ap-news" class="adm-panel">
+        <div class="adm-ph"><h2>Neuigkeiten</h2><p>Ankündigungen und Berichte verwalten</p></div>
+        <div id="newsAdmList"></div>
+        <div class="esurf" style="margin-top:.5rem">
+          <h3>✦ Neue Meldung veröffentlichen</h3>
+          <div class="frow">
+            <div class="fg"><label>Titel</label><input type="text" id="nwTitle" placeholder="Überschrift der Meldung"></div>
+            <div class="fg"><label>Datum</label><input type="date" id="nwDate"></div>
+          </div>
+          <div class="fg"><label>Inhalt</label><textarea id="nwBody" rows="5" placeholder="Text der Meldung..."></textarea></div>
+          <div class="frow">
+            <div class="fg"><label>Autor</label><input type="text" id="nwAuthor" placeholder="z.B. Priester Heinrich"></div>
+            <div class="fg"><label>Anpinnen</label><select id="nwPin"><option value="0">Nein</option><option value="1">Ja (oben anzeigen)</option></select></div>
+          </div>
+          <div class="save-row"><button class="btn btn-gold btn-sm" onclick="addNews()">Veröffentlichen</button><span class="f-ok" id="nwOk">✓ Veröffentlicht</span></div>
+        </div>
+      </div>
+
+      <!-- GALLERY ADMIN -->
+      <div id="ap-gallery" class="adm-panel">
+        <div class="adm-ph"><h2>Galerie verwalten</h2><p>Bilder und Eindrücke pflegen</p></div>
+        <div id="galleryAdmList"></div>
+        <div class="esurf" style="margin-top:.5rem">
+          <h3>✦ Neues Bild hochladen</h3>
+          <div class="fg">
+            <label>Bild auswählen</label>
+            <div id="glDropzone" onclick="document.getElementById('glFile').click()" style="border:2px dashed var(--border2);border-radius:9px;padding:2.5rem;text-align:center;cursor:pointer;transition:all .25s;background:rgba(200,168,75,.03)">
+              <div id="glPreviewWrap" style="display:none;margin-bottom:1rem">
+                <img id="glPreview" style="max-height:180px;max-width:100%;border-radius:7px;border:1px solid var(--border2);object-fit:cover">
+              </div>
+              <div id="glDropLabel">
+                <div style="font-size:2rem;margin-bottom:.5rem">📷</div>
+                <div style="font-size:.83rem;color:var(--text2)">Klicken zum Auswählen oder Bild hierher ziehen</div>
+                <div style="font-size:.7rem;color:var(--text3);margin-top:.3rem">JPG, PNG, GIF, WEBP — max. 10 MB</div>
+              </div>
+              <input type="file" id="glFile" accept="image/*" style="display:none" onchange="previewGalImage(this)">
+            </div>
+            <div class="f-err" id="glFileErr">⚠ Bitte ein Bild auswählen</div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label>Titel</label><input type="text" id="glTitle" placeholder="Bildtitel"></div>
+            <div class="fg"><label>Kategorie</label><select id="glCat"><option value="gottesdienst">Gottesdienst</option><option value="veranstaltung">Veranstaltung</option><option value="gemeinschaft">Gemeinschaft</option><option value="sonstiges">Sonstiges</option></select></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label>Datum</label><input type="date" id="glDate"></div>
+            <div class="fg"><label>Beschreibung</label><input type="text" id="glDesc" placeholder="Kurze Bildbeschreibung"></div>
+          </div>
+          <div class="save-row"><button class="btn btn-gold btn-sm" onclick="addGalleryItem()">Hochladen & hinzufügen</button><span class="f-ok" id="glOk">✓ Hinzugefügt</span></div>
+        </div>
+      </div>
+
+      <!-- MESSINTENTIONEN ADMIN -->
+      <div id="ap-messintentionen" class="adm-panel">
+        <div class="adm-ph"><h2>Messintentionen</h2><p>Heilige Messen für besondere Anliegen verwalten</p></div>
+        <div id="mintAdmList"></div>
+        <div class="esurf" style="margin-top:.5rem">
+          <h3>✦ Neue Messintention eintragen</h3>
+          <div class="frow">
+            <div class="fg"><label>Datum der Messe</label><input type="date" id="miDate"></div>
+            <div class="fg"><label>Uhrzeit</label><input type="time" id="miTime"></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label>Intention / Anlass</label><input type="text" id="miTitle" placeholder="z.B. Für die Seele von…"></div>
+            <div class="fg"><label>Bestellt von</label><input type="text" id="miRequester" placeholder="Name des Auftraggebers"></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label>Zelebrant</label><input type="text" id="miCelebrant" placeholder="z.B. Priester Heinrich"></div>
+            <div class="fg"><label>Status</label><select id="miStatus"><option value="offen">Offen</option><option value="gehalten">Gehalten</option><option value="storniert">Storniert</option></select></div>
+          </div>
+          <div class="fg"><label>Öffentlich sichtbar</label><select id="miPublic"><option value="1">Ja</option><option value="0">Nein</option></select></div>
+          <div class="save-row"><button class="btn btn-gold btn-sm" onclick="addMessintention()">Eintragen</button><span class="f-ok" id="miOk">✓ Eingetragen</span></div>
+        </div>
+      </div>
+
+      <!-- PARTNERS -->
+      <div id="ap-partners" class="adm-panel">
+        <div class="adm-ph"><h2>Partner verwalten</h2><p>Partnerorganisationen verwalten</p></div>
+        <div id="partnerAdmList"></div>
+        <div class="esurf" style="margin-top:.5rem">
+          <h3>✦ Neuen Partner eintragen</h3>
+          <div class="frow">
+            <div class="fg"><label>Organisationsname</label><input type="text" id="ptName" placeholder="Name der Organisation"></div>
+            <div class="fg"><label>Art / Beschreibung</label><input type="text" id="ptType" placeholder="z.B. Sozialwerk, Bildungsinstitut"></div>
+          </div>
+          <div class="fg"><label>Logo / Icon (Emoji)</label><input type="text" id="ptLogo" placeholder="🏛️" style="max-width:90px"></div>
+          <div class="save-row"><button class="btn btn-gold btn-sm" onclick="addPartner()">Hinzufügen</button><span class="f-ok" id="ptOk">✓ Hinzugefügt</span></div>
+        </div>
+      </div>
+
+      <!-- HIERARCHY -->
+      <div id="ap-hierarchy" class="adm-panel">
+        <div class="adm-ph"><h2>Rangordnung</h2><p>Hierarchie verwalten</p></div>
+        <div id="hierAdm"></div>
+        <div class="esurf" style="margin-top:.5rem">
+          <h3>✦ Rang hinzufügen</h3>
+          <div class="frow">
+            <div class="fg"><label>Rangbezeichnung</label><input type="text" id="hRank" placeholder="z.B. Bischof"></div>
+            <div class="fg"><label>Beschreibung</label><input type="text" id="hDesc" placeholder="Kurze Beschreibung"></div>
+          </div>
+          <div class="save-row"><button class="btn btn-gold btn-sm" onclick="addHier()">Hinzufügen</button><span class="f-ok" id="hOk">✓ Hinzugefügt</span></div>
+        </div>
+      </div>
+
+      <!-- TEAM -->
+      <div id="ap-team" class="adm-panel">
+        <div class="adm-ph"><h2>Mitarbeiter</h2><p>Kirchliche Mitarbeiter verwalten</p></div>
+        <div class="tw"><table><thead><tr><th>Name</th><th>Funktion</th><th>Avatar</th><th></th></tr></thead><tbody id="teamTBody"></tbody></table></div>
+        <div class="esurf">
+          <h3>✦ Mitarbeiter hinzufügen</h3>
+          <div class="frow">
+            <div class="fg"><label>Name</label><input type="text" id="tmName" placeholder="Vollständiger Name"></div>
+            <div class="fg"><label>Funktion / Titel</label><input type="text" id="tmRole" placeholder="z.B. Priester, Organist"></div>
+          </div>
+          <div class="fg"><label>Avatar (Emoji)</label><input type="text" id="tmEmoji" placeholder="⛪" style="max-width:90px"></div>
+          <div class="save-row"><button class="btn btn-gold btn-sm" onclick="addTeam()">Hinzufügen</button><span class="f-ok" id="tmOk">✓ Hinzugefügt</span></div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div id="ap-users" class="adm-panel">
+        <div class="adm-ph"><h2>Benutzer</h2><p>Zugangsdaten verwalten</p></div>
+        <div class="tw"><table><thead><tr><th>Name</th><th>Benutzername</th><th>Rolle</th><th>Erstellt</th><th></th></tr></thead><tbody id="usersTBody"></tbody></table></div>
+        <div class="esurf">
+          <h3>✦ Neuen Benutzer erstellen</h3>
+          <div class="frow">
+            <div class="fg"><label>Name</label><input type="text" id="uName" placeholder="Vollständiger Name / Titel"></div>
+            <div class="fg"><label>Rolle</label><select id="uRole"><option value="">— Rolle wählen —</option><option value="priester">Priester</option><option value="vikar">Vikar</option></select></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label>Benutzername (Login)</label><input type="text" id="uLogin" placeholder="Login-Name"></div>
+            <div class="fg"><label>Passwort</label>
+              <div class="pass-wrap">
+                <input type="password" id="uPass" placeholder="Sicheres Passwort">
+                <button type="button" class="pass-toggle" onclick="togglePass('uPass',this)">👁</button>
+              </div>
+            </div>
+          </div>
+          <div class="save-row"><button class="btn btn-gold btn-sm" onclick="createUser()">Erstellen</button><span class="f-ok" id="uOk">✓ Erstellt</span></div>
+        </div>
+      </div>
+
+      <!-- STATISTIKEN ADMIN -->
+      <!-- KIRCHENJAHR VORSCHAU -->
+      <div id="ap-seasonpreview" class="adm-panel">
+        <div class="adm-ph"><h2>Kirchenjahr-Vorschau</h2><p>Saisons simulieren und optisch prüfen</p></div>
+        <div class="esurf">
+          <h3>🎨 Saison simulieren</h3>
+          <p style="font-size:.82rem;color:var(--text3);margin-bottom:1.4rem;line-height:1.7">Wähle eine Saison um Banner, Farbschema und Kirchenjahr-Widget so anzuzeigen wie es Besucher während dieser Zeit sehen würden. Die Simulation gilt nur für diese Sitzung.</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.5rem;margin-bottom:1.4rem">
+            <div class="pg-btn" onclick="previewSeason('auto')"><div class="pgb-ic">🔄</div><div class="pgb-n">Automatisch</div><div class="pgb-d">Echtes Datum</div></div>
+            <div class="pg-btn" onclick="previewSeason('advent')"><div class="pgb-ic">🕯️</div><div class="pgb-n">Advent</div><div class="pgb-d">Violett · Schnee</div></div>
+            <div class="pg-btn" onclick="previewSeason('christmas')"><div class="pgb-ic">⭐</div><div class="pgb-n">Weihnachten</div><div class="pgb-d">Weiß · Schnee</div></div>
+            <div class="pg-btn" onclick="previewSeason('epiphanias')"><div class="pgb-ic">✨</div><div class="pgb-n">Nach Epiphanias</div><div class="pgb-d">Weiß</div></div>
+            <div class="pg-btn" onclick="previewSeason('vorfasten')"><div class="pgb-ic">🌿</div><div class="pgb-n">Vorfastenzeit</div><div class="pgb-d">Grün</div></div>
+            <div class="pg-btn" onclick="previewSeason('lent')"><div class="pgb-ic">🕊️</div><div class="pgb-n">Passionszeit</div><div class="pgb-d">Violett</div></div>
+            <div class="pg-btn" onclick="previewSeason('palmsonntag')"><div class="pgb-ic">🌿</div><div class="pgb-n">Palmsonntag</div><div class="pgb-d">Rot</div></div>
+            <div class="pg-btn" onclick="previewSeason('gruend')"><div class="pgb-ic">🍞</div><div class="pgb-n">Gründonnerstag</div><div class="pgb-d">Weiß</div></div>
+            <div class="pg-btn" onclick="previewSeason('karfreitag')"><div class="pgb-ic">✝</div><div class="pgb-n">Karfreitag</div><div class="pgb-d">Schwarz</div></div>
+            <div class="pg-btn" onclick="previewSeason('karsamstag')"><div class="pgb-ic">🕯️</div><div class="pgb-n">Karsamstag</div><div class="pgb-d">Schwarz</div></div>
+            <div class="pg-btn" onclick="previewSeason('easter')"><div class="pgb-ic">🌅</div><div class="pgb-n">Osterzeit</div><div class="pgb-d">Weiß</div></div>
+            <div class="pg-btn" onclick="previewSeason('himmelfahrt')"><div class="pgb-ic">☁️</div><div class="pgb-n">Himmelfahrt</div><div class="pgb-d">Weiß</div></div>
+            <div class="pg-btn" onclick="previewSeason('pentecost')"><div class="pgb-ic">🔥</div><div class="pgb-n">Pfingsten</div><div class="pgb-d">Rot</div></div>
+            <div class="pg-btn" onclick="previewSeason('trinitatis')"><div class="pgb-ic">☁️</div><div class="pgb-n">Trinitatis</div><div class="pgb-d">Weiß</div></div>
+            <div class="pg-btn" onclick="previewSeason('trinitat')"><div class="pgb-ic">🌿</div><div class="pgb-n">Trinitatiszeit</div><div class="pgb-d">Grün</div></div>
+            <div class="pg-btn" onclick="previewSeason('israel')"><div class="pgb-ic">✡️</div><div class="pgb-n">Israelsonntag</div><div class="pgb-d">Violett</div></div>
+            <div class="pg-btn" onclick="previewSeason('michaelis')"><div class="pgb-ic">⚔️</div><div class="pgb-n">Michaelis</div><div class="pgb-d">Weiß</div></div>
+            <div class="pg-btn" onclick="previewSeason('erntedank')"><div class="pgb-ic">🌾</div><div class="pgb-n">Erntedank</div><div class="pgb-d">Grün</div></div>
+            <div class="pg-btn" onclick="previewSeason('reformatio')"><div class="pgb-ic">🔑</div><div class="pgb-n">Reformationstag</div><div class="pgb-d">Rot</div></div>
+            <div class="pg-btn" onclick="previewSeason('bussbet')"><div class="pgb-ic">🙏</div><div class="pgb-n">Buß- und Bettag</div><div class="pgb-d">Violett</div></div>
+            <div class="pg-btn" onclick="previewSeason('ewigkeit')"><div class="pgb-ic">🕊️</div><div class="pgb-n">Ewigkeitssonntag</div><div class="pgb-d">Weiß</div></div>
+          </div>
+          <div id="spActiveLabel" style="font-size:.78rem;color:var(--text3);padding:.6rem 1rem;background:var(--bg2);border-radius:6px;border:1px solid var(--border)">Aktuell: <span id="spActiveName" style="color:var(--gold)">Automatisch (echtes Datum)</span></div>
+        </div>
+      </div>
+
+      <div id="ap-stats" class="adm-panel">
+        <div class="adm-ph"><h2>Öffentliche Statistiken</h2><p>Zahlen auf der Startseite</p></div>
+        <div class="esurf">
+          <h3>✦ Statistiken bearbeiten</h3>
+          <div class="frow">
+            <div class="fg"><label>Mitgliederzahl</label><input type="number" id="stMembers" placeholder="0"></div>
+            <div class="fg"><label>Gottesdienste abgehalten</label><input type="number" id="stServices" placeholder="0"></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label>Spenden gesammelt (€)</label><input type="number" id="stDonations" placeholder="0"></div>
+            <div class="fg"><label>Projekte abgeschlossen</label><input type="number" id="stProjects" placeholder="0"></div>
+          </div>
+          <div class="save-row"><button class="btn btn-gold btn-sm" onclick="saveStats()">Speichern</button><span class="f-ok" id="stOk">✓ Gespeichert</span></div>
+        </div>
+      </div>
+
+      <!-- KIRCHENBUCH -->
+      <div id="ap-kirchenbuch" class="adm-panel">
+        <div class="adm-ph"><h2>Kirchenbuch</h2><p>Internes Register — Geburten, Taufen, Hochzeiten, Beerdigungen</p></div>
+        <div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1.4rem" id="kbFilterBar">
+          <button class="pfbtn on" onclick="filterKb(this,'alle')">Alle</button>
+          <button class="pfbtn" onclick="filterKb(this,'taufe')">💧 Taufen</button>
+          <button class="pfbtn" onclick="filterKb(this,'hochzeit')">💍 Hochzeiten</button>
+          <button class="pfbtn" onclick="filterKb(this,'beerdigung')">🕯️ Beerdigungen</button>
+        </div>
+        <div id="kbList"></div>
+        <div class="esurf" style="margin-top:1rem">
+          <h3>✦ Neuen Eintrag anlegen</h3>
+          <div class="frow">
+            <div class="fg"><label>Art des Eintrags</label>
+              <select id="kbType">
+                <option value="taufe">💧 Taufe</option>
+                <option value="hochzeit">💍 Hochzeit</option>
+                <option value="beerdigung">🕯️ Beerdigung</option>
+              </select>
+            </div>
+            <div class="fg"><label>Datum</label><input type="date" id="kbDate"></div>
+          </div>
+          <div class="fg"><label>Name / Personen</label><input type="text" id="kbName" placeholder="z.B. Maria Müller — oder bei Hochzeit: Max & Maria Müller"></div>
+          <div class="frow">
+            <div class="fg"><label>Ort / Kirche</label><input type="text" id="kbOrt" placeholder="z.B. St. Johannes Kirche"></div>
+            <div class="fg"><label>Zelebrant</label><input type="text" id="kbCelebrant" placeholder="z.B. Priester Heinrich"></div>
+          </div>
+          <div class="fg"><label>Anmerkungen</label><input type="text" id="kbNote" placeholder="Interne Notizen (optional)"></div>
+          <div class="save-row"><button class="btn btn-gold btn-sm" onclick="addKbEntry()">Eintragen</button><span class="f-ok" id="kbOk">✓ Eingetragen</span></div>
+        </div>
+      </div>
+
+      <!-- AKTIVITÄTSLOG -->
+      <div id="ap-log" class="adm-panel">
+        <div class="adm-ph"><h2>Aktivitätslog</h2><p>Alle Aktionen der Verwaltung</p></div>
+        <div class="esurf" style="padding:1.2rem">
+          <div class="log-list" id="logList"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">✕ Schließen</button>
+  <img id="lbImg" style="max-height:70vh;max-width:90vw;border-radius:10px;border:1px solid var(--border2);object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.6)" onclick="event.stopPropagation()">
+  <div class="lb-info">
+    <h3 id="lbTitle"></h3>
+    <p id="lbDesc"></p>
+    <p style="font-size:.7rem;color:var(--text3);margin-top:.4rem" id="lbDate"></p>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal">
+    <button class="m-close" onclick="closeModal()">✕</button>
+    <div class="m-cross">✝</div>
+    <h2>Anmelden</h2>
+    <p class="m-sub">Kirchenverwaltung</p>
+    <div class="fg"><label>Benutzername</label><input type="text" id="lUser" placeholder="Login-Name" autocomplete="off"></div>
+    <div class="fg"><label>Passwort</label>
+      <div class="pass-wrap">
+        <input type="password" id="lPass" placeholder="••••••••">
+        <button type="button" class="pass-toggle" onclick="togglePass('lPass',this)">👁</button>
+      </div>
+    </div>
+    <div class="f-err" id="lErr">⚠ Ungültige Zugangsdaten</div>
+    <div style="margin-top:1.4rem"><button class="btn btn-gold" style="width:100%" onclick="doLogin()">Anmelden</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── API CONFIG ───
+const API_URL = 'https://ui-kirche.xo.je/api.php';
+let authToken = localStorage.getItem('kircheToken') || null;
+
+// ── API-Helfer ─────────────────────────────────────────────────────────────
+async function api(action, body = null) {
+  const opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' } };
+  if (authToken) opts.headers['X-Auth-Token'] = authToken;
+  if (body) opts.body = JSON.stringify({ ...body, action });
+  const url = body ? API_URL : `${API_URL}?action=${action}`;
+  const res = await fetch(url, opts);
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || 'API-Fehler');
+  return json.data;
+}
+
+// ─── STATE (wird beim Start von API geladen) ───────────────────────────────
+const S = {
+  user: null,
+  accounts: [],
+  hierarchy: [],
+  team: [],
+  prayers: [],
+  calEvents: [],
+  projects: [],
+  partners: [],
+  activityLog: [],
+  stats: { members: 0, services: 0, donations: 0, projects: 0 },
+  news: [],
+  gallery: [],
+  messintentionen: [],
+  kirchenbuch: [],
+  pages: {
+    start:   { tagline: 'Licht in der Dunkelheit — Gemeinschaft im Glauben' },
+    ueber:   { lead: '', mission: '', werte: '' },
+    spenden: { title: '', text1: '', text2: '', verwendung: '' }
+  }
+};
+let nid = 1000;
+const uid = () => ++nid;
+
+// Daten von API in State laden
+async function loadFromAPI() {
+  try {
+    const data = await api('load');
+    Object.assign(S, data);
+    if (data.nextId) nid = data.nextId;
+    applyAllPageContent();
+    renderHier(); renderTeam(); renderPrayers(); renderProjects();
+    renderStats(); renderPartners(); renderNews(); renderGallery();
+  } catch(e) { console.error('Ladefehler:', e); }
+}
+
+function applyAllPageContent() {
+  applyPg('start'); applyPg('ueber'); applyPg('spenden');
+}
+
+// ─── SEASONAL DETECTION ───
+// ─── KIRCHENJAHR & LITURGISCHE FARBEN (Evangelisch) ───
+
+function getEasterDate(year){
+  const a=year%19,b=Math.floor(year/100),c=year%100;
+  const d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25);
+  const g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30;
+  const i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7;
+  const m2=Math.floor((a+11*h+22*l)/451);
+  const month=Math.floor((h+l-7*m2+114)/31);
+  const day=((h+l-7*m2+114)%31)+1;
+  return new Date(year,month-1,day);
+}
+
+// Liturgische Farbpaletten
+const LITU_COLORS={
+  violet:{
+    gold:'#b89fd0',gold2:'#d0bcea',gold3:'#7a5fa0',
+    glow:'rgba(160,120,200,0.22)',
+    border:'rgba(160,120,200,0.13)',border2:'rgba(160,120,200,0.3)',border3:'rgba(160,120,200,0.5)',
+    orb1:'#5a3080',orb2:'#301848',orb3:'#7040a0',
+    bannerBg:'rgba(50,20,80,.82)',bannerBorder:'rgba(160,120,200,.28)',bannerColor:'#c0a0e0',
+    snow:false
+  },
+  rose:{
+    gold:'#e8a0b8',gold2:'#f0c0d0',gold3:'#c06080',
+    glow:'rgba(220,140,170,0.22)',
+    border:'rgba(220,140,170,0.13)',border2:'rgba(220,140,170,0.32)',border3:'rgba(220,140,170,0.52)',
+    orb1:'#a04060',orb2:'#601830',orb3:'#c05080',
+    bannerBg:'rgba(80,20,40,.82)',bannerBorder:'rgba(220,140,170,.3)',bannerColor:'#f0b0c8',
+    snow:false
+  },
+  red:{
+    gold:'#ff8c60',gold2:'#ffb080',gold3:'#c04820',
+    glow:'rgba(255,100,50,0.22)',
+    border:'rgba(255,100,50,0.14)',border2:'rgba(255,100,50,0.32)',border3:'rgba(255,100,50,0.52)',
+    orb1:'#cc3010',orb2:'#882008',orb3:'#ff5020',
+    bannerBg:'rgba(100,20,5,.82)',bannerBorder:'rgba(255,100,40,.28)',bannerColor:'#ffb080',
+    snow:false
+  },
+  white:{
+    gold:'#e8d070',gold2:'#f4e898',gold3:'#b09020',
+    glow:'rgba(240,210,80,0.25)',
+    border:'rgba(240,210,80,0.13)',border2:'rgba(240,210,80,0.32)',border3:'rgba(240,210,80,0.52)',
+    orb1:'#c89020',orb2:'#804060',orb3:'#e8c840',
+    bannerBg:'rgba(80,60,5,.82)',bannerBorder:'rgba(240,200,60,.3)',bannerColor:'#f4e080',
+    snow:false
+  },
+  green:{
+    gold:'#7ec89a',gold2:'#a8ddb8',gold3:'#3a8a58',
+    glow:'rgba(100,190,130,0.2)',
+    border:'rgba(100,190,130,0.12)',border2:'rgba(100,190,130,0.28)',border3:'rgba(100,190,130,0.48)',
+    orb1:'#2a6840',orb2:'#184830',orb3:'#3a8858',
+    bannerBg:'rgba(15,40,20,.82)',bannerBorder:'rgba(100,190,130,.25)',bannerColor:'#90d8a8',
+    snow:false
+  },
+  black:{
+    gold:'#9a9080',gold2:'#b0a898',gold3:'#605850',
+    glow:'rgba(120,110,90,0.18)',
+    border:'rgba(120,110,90,0.14)',border2:'rgba(120,110,90,0.28)',border3:'rgba(120,110,90,0.44)',
+    orb1:'#302820',orb2:'#201810',orb3:'#403830',
+    bannerBg:'rgba(10,8,5,.9)',bannerBorder:'rgba(100,90,70,.25)',bannerColor:'#a09080',
+    snow:false
+  },
+  // Christmas gets snow + warm gold
+  christmas:{
+    gold:'#e8c850',gold2:'#f4dc80',gold3:'#a88010',
+    glow:'rgba(230,195,60,0.28)',
+    border:'rgba(230,195,60,0.14)',border2:'rgba(230,195,60,0.34)',border3:'rgba(230,195,60,0.54)',
+    orb1:'#c08010',orb2:'#8a1818',orb3:'#d4a020',
+    bannerBg:'rgba(100,30,10,.82)',bannerBorder:'rgba(220,160,60,.3)',bannerColor:'#f0d080',
+    snow:true
+  },
+  advent:{
+    gold:'#a8c8ff',gold2:'#c0daff',gold3:'#5a8ad0',
+    glow:'rgba(100,160,255,0.2)',
+    border:'rgba(100,160,255,0.12)',border2:'rgba(100,160,255,0.3)',border3:'rgba(100,160,255,0.5)',
+    orb1:'#3a6fd8',orb2:'#1a3a80',orb3:'#4a80e8',
+    bannerBg:'rgba(15,30,90,.82)',bannerBorder:'rgba(100,160,255,.25)',bannerColor:'#a8c8ff',
+    snow:true
+  }
+};
+
+function applyLiturgicalColor(colorKey, bannerText, greet){
+  const p=LITU_COLORS[colorKey]||LITU_COLORS.green;
+  const r=document.documentElement.style;
+  r.setProperty('--gold',p.gold);
+  r.setProperty('--gold2',p.gold2);
+  r.setProperty('--gold3',p.gold3);
+  r.setProperty('--gold-glow',p.glow);
+  r.setProperty('--border',p.border);
+  r.setProperty('--border2',p.border2);
+  r.setProperty('--border3',p.border3);
+  r.setProperty('--orb1-color',p.orb1);
+  r.setProperty('--orb2-color',p.orb2);
+  r.setProperty('--orb3-color',p.orb3);
+  r.setProperty('--banner-bg',p.bannerBg);
+  r.setProperty('--banner-border',p.bannerBorder);
+  r.setProperty('--banner-color',p.bannerColor);
+  // Snow
+  if(p.snow&&!snowRunning){snowRunning=true;startSnow();}
+  else if(!p.snow){const c=document.getElementById('snow-canvas');if(c)c.style.display='none';snowRunning=false;}
+  document.body.classList.toggle('snow-on',!!p.snow);
+  // Banner
+  const banner=document.getElementById('seasonBanner');
+  if(bannerText){banner.textContent=bannerText;document.body.classList.add('has-banner');}
+  else{document.body.classList.remove('has-banner');}
+  // Hero greeting
+  const el=document.getElementById('heroPre');
+  if(el&&greet) el.textContent=greet;
+}
+
+function getLiturgicalDay(dateObj){
+  // Vollständiger evangelischer Kirchenkalender nach EKD-Perikopenordnung
+  // Quellen: kirchenjahr-evangelisch.de, stilkunst.de, Wikipedia Liturgische Farben
+  const y=dateObj.getFullYear();
+  const ms=new Date(y,dateObj.getMonth(),dateObj.getDate()).getTime();
+  const DAY=86400000;
+  const easter=getEasterDate(y);
+  const eMs=easter.getTime();
+
+  // ── Hilfsfunktionen ──────────────────────────────────────────
+  function d(mo,da){ return new Date(y,mo-1,da).getTime(); } // festes Datum
+  function eOff(n){ return eMs+n*DAY; }                      // relativ zu Ostern
+
+  // Advent: 4. Sonntag vor Weihnachten
+  function getAdvent(yr){
+    const xmas=new Date(yr,11,25);
+    const dow=xmas.getDay(); // 0=So
+    // Gehe zurück bis zum 4. Sonntag vor dem 25.12.
+    const back=dow===0?28:dow+21;
+    return new Date(yr,11,25-back).getTime();
+  }
+  const advMs=getAdvent(y);
+
+  // ── Karwoche / Heilige Woche ──────────────────────────────────
+  const palmMs    = eOff(-7);   // Palmsonntag
+  const gruenMs   = eOff(-3);   // Gründonnerstag
+  const karfriMs  = eOff(-2);   // Karfreitag
+  const karsamMs  = eOff(-1);   // Karsamstag
+
+  // ── Passionszeit (ab Aschermittwoch) ─────────────────────────
+  const ashMs     = eOff(-46);  // Aschermittwoch
+  // Letzter Sonntag nach Epiphanias fällt in die Woche des 2. Februar
+  // genauer: letzter Sonntag vor Aschermittwoch MINUS 7 Tage = Estomihi
+  // Estomihi = Sonntag vor Aschermittwoch = eOff(-49)
+  const estomihiMs= eOff(-49);
+  const sexagesMs = eOff(-56);  // Sexagesimae (entfällt wenn Ostern < 31.3.)
+  // Invokavit = 1. Fastensonntag = eOff(-42)
+  // Reminiszere = eOff(-35), Okuli = eOff(-28), Lätare = eOff(-21), Judika = eOff(-14)
+
+  // ── Osterzeit ─────────────────────────────────────────────────
+  const pentMs    = eOff(49);   // Pfingstsonntag
+  const pfingstMo = eOff(50);   // Pfingstmontag
+  const trinMs    = eOff(56);   // Trinitatis
+
+  // ── Trinitatiszeit ────────────────────────────────────────────
+  // Israelsonntag = 10. Sonntag nach Trinitatis = eOff(56+70)
+  const israelMs  = eOff(126);
+  // Buß- und Bettag = Mittwoch vor dem letzten Sonntag vor Advent
+  // = 11 Tage vor Ewigkeitssonntag
+  const ewigkeitMs= advMs-7*DAY; // Ewigkeitssonntag (letzter vor Advent)
+  const bussbetMs = ewigkeitMs-11*DAY; // Mittwoch davor
+  // Reformationstag = 31. Oktober
+  const reformMs  = d(10,31);
+  // Michaelis = 29. September
+  const michaelMs = d(9,29);
+  // Erntedank = 1. Sonntag im Oktober
+  const okt1=new Date(y,9,1);
+  const erntedankMs=new Date(y,9,1+(7-okt1.getDay())%7).getTime();
+
+  // ────────────────────────────────────────────────────────────────
+  // WEIHNACHTSZEIT: Heiligabend (24.12.) bis Epiphanias (6.1.)
+  // ────────────────────────────────────────────────────────────────
+  if(ms>=d(12,24)) return {colorKey:'christmas',icon:'⭐',name:'Weihnachtszeit',
+    banner:'✦ Frohe Weihnachten — Frieden sei mit euch ✦',greet:'Frohe Weihnachten',
+    desc:'Die Zeit der Geburt Jesu Christi — vom Heiligabend bis Epiphanias.'};
+  if(dateObj.getMonth()===0&&dateObj.getDate()<=5) return {colorKey:'christmas',icon:'⭐',
+    name:'Weihnachtszeit',banner:'✦ Frohe Weihnachten — Frieden sei mit euch ✦',
+    greet:'Frohe Weihnachten',desc:'Die Zeit der Geburt Jesu Christi.'};
+
+  // ────────────────────────────────────────────────────────────────
+  // EPIPHANIAS (6.1.) — weiß
+  // ────────────────────────────────────────────────────────────────
+  if(dateObj.getMonth()===0&&dateObj.getDate()===6) return {colorKey:'white',icon:'✨',
+    name:'Epiphanias',banner:'✦ Epiphanias — Erscheinung des Herrn ✦',
+    greet:'Gesegnetes Epiphanias',desc:'Das Fest der Erscheinung des Herrn — Heilige Drei Könige.'};
+
+  // ────────────────────────────────────────────────────────────────
+  // SONNTAGE NACH EPIPHANIAS (7.1. bis Estomihi) — seit 2019 WEISS
+  // ────────────────────────────────────────────────────────────────
+  if(ms>d(1,6)&&ms<ashMs&&ms!==estomihiMs&&ms!==sexagesMs){
+    // Letzter Sonntag nach Epiphanias besonders hervorheben
+    const lastEpiMs=ashMs-7*DAY; // Sonntag vor Aschermittwoch ist Estomihi, davor ist letzter nach Epi
+    // Genauer: letzter Sonntag nach Epiphanias = Sonntag in der Woche des 2. Februar
+    // = immer der Sonntag zwischen 27.1. und 2.2.
+    const feb2=new Date(y,1,2);
+    const feb2dow=feb2.getDay();
+    const lastEpiSunMs=new Date(y,1,2-(feb2dow===0?7:feb2dow)).getTime();
+    if(ms===lastEpiSunMs) return {colorKey:'white',icon:'☀️',
+      name:'Letzter Sonntag nach Epiphanias',
+      banner:'✦ Letzter Sonntag nach Epiphanias ✦',greet:null,
+      desc:'Der letzte Sonntag der Epiphaniaszeit — Verklärung Christi.'};
+    return {colorKey:'white',icon:'✨',name:'Zeit nach Epiphanias',banner:null,greet:null,
+      desc:'Die Sonntage nach Epiphanias — Christi Licht leuchtet in der Welt.'};
+  }
+
+  // ────────────────────────────────────────────────────────────────
+  // VORFASTENZEIT (Sexagesimae, Estomihi) — GRÜN
+  // ────────────────────────────────────────────────────────────────
+  if(ms===sexagesMs) return {colorKey:'green',icon:'🌿',name:'Sexagesimae',
+    banner:null,greet:null,
+    desc:'2. Sonntag vor der Passionszeit — Sexagesimae.'};
+  if(ms===estomihiMs) return {colorKey:'green',icon:'🌿',name:'Estomihi',
+    banner:null,greet:null,
+    desc:'Sonntag vor Aschermittwoch — Estomihi. Sei mir ein starker Fels.'};
+
+  // ────────────────────────────────────────────────────────────────
+  // PASSIONSZEIT — VIOLETT
+  // ────────────────────────────────────────────────────────────────
+  if(ms===ashMs) return {colorKey:'violet',icon:'🕊️',name:'Aschermittwoch',
+    banner:'✦ Aschermittwoch — Besinnung und Umkehr ✦',
+    greet:'Gesegneten Aschermittwoch',desc:'Beginn der Passionszeit — 46 Tage vor Ostern.'};
+
+  // Einzelne Passionssonntage benennen
+  if(ms===eOff(-42)) return {colorKey:'violet',icon:'🕊️',name:'Invokavit',
+    banner:'✦ Passionszeit — Invokavit ✦',greet:'Gesegnete Passionszeit',
+    desc:'1. Sonntag der Passionszeit — Invokavit: „Er ruft mich an."'};
+  if(ms===eOff(-35)) return {colorKey:'violet',icon:'🕊️',name:'Reminiszere',
+    banner:'✦ Passionszeit — Reminiszere ✦',greet:'Gesegnete Passionszeit',
+    desc:'2. Sonntag der Passionszeit — Reminiszere: „Gedenke, Herr."'};
+  if(ms===eOff(-28)) return {colorKey:'violet',icon:'🕊️',name:'Okuli',
+    banner:'✦ Passionszeit — Okuli ✦',greet:'Gesegnete Passionszeit',
+    desc:'3. Sonntag der Passionszeit — Okuli: „Meine Augen sehen stets auf den Herrn."'};
+  if(ms===eOff(-21)) return {colorKey:'violet',icon:'🕊️',name:'Lätare',
+    banner:'✦ Lätare — Freue dich, Jerusalem ✦',greet:'Gesegneten Lätare-Sonntag',
+    desc:'4. Sonntag der Passionszeit — Lätare: „Freue dich, Jerusalem."'};
+  if(ms===eOff(-14)) return {colorKey:'violet',icon:'🕊️',name:'Judika',
+    banner:'✦ Passionszeit — Judika ✦',greet:'Gesegnete Passionszeit',
+    desc:'5. Sonntag der Passionszeit — Judika: „Schaffe mir Recht, Gott."'};
+
+  // Palmsonntag — ROT (Einzug, Märtyrerfarbe)
+  if(ms===palmMs) return {colorKey:'red',icon:'🌿',name:'Palmsonntag',
+    banner:'✦ Palmsonntag — Hosianna dem Sohn Davids ✦',greet:'Gesegneten Palmsonntag',
+    desc:'6. Sonntag der Passionszeit — Einzug Jesu in Jerusalem.'};
+
+  // Gründonnerstag — WEISS (Abendmahl)
+  if(ms===gruenMs) return {colorKey:'white',icon:'🍞',name:'Gründonnerstag',
+    banner:'✦ Gründonnerstag — Einsetzung des heiligen Abendmahls ✦',
+    greet:'Gesegneten Gründonnerstag',
+    desc:'Donnerstag vor Ostern — Einsetzung des heiligen Abendmahls.'};
+
+  // Karfreitag — SCHWARZ
+  if(ms===karfriMs) return {colorKey:'black',icon:'✝',name:'Karfreitag',
+    banner:'✦ Karfreitag — Er trug unsere Schuld ✦',greet:'Stiller Karfreitag',
+    desc:'Freitag vor Ostern — Kreuzigung und Tod Jesu Christi.'};
+
+  // Karsamstag — SCHWARZ
+  if(ms===karsamMs) return {colorKey:'black',icon:'🕯️',name:'Karsamstag',
+    banner:'✦ Karsamstag — Die Stille des Grabes ✦',greet:'Stiller Karsamstag',
+    desc:'Samstag vor Ostern — Tag der Grabesruhe.'};
+
+  // Restliche Passionszeit (Werktage)
+  if(ms>ashMs&&ms<eMs){
+    const rem=Math.round((eMs-ms)/DAY);
+    return {colorKey:'violet',icon:'🕊️',name:'Passionszeit',
+      banner:'✦ Passionszeit — Umkehr und Erneuerung ✦',greet:'Gesegnete Passionszeit',
+      desc:`Noch ${rem} Tag${rem===1?'':'e'} bis Ostern — Zeit der Buße und Besinnung.`};
+  }
+
+  // ────────────────────────────────────────────────────────────────
+  // OSTERZEIT — WEISS
+  // ────────────────────────────────────────────────────────────────
+  if(ms===eMs) return {colorKey:'white',icon:'🌅',name:'Ostersonntag',
+    banner:'✦ Christus ist auferstanden! Halleluja! ✦',greet:'Frohe Ostern!',
+    desc:'Der Herr ist auferstanden — er ist wahrhaftig auferstanden! Halleluja!'};
+
+  const osterNames=['Quasimodogeniti','Miserikordias Domini','Jubilate','Kantate','Rogate','Exaudi'];
+  for(let i=0;i<6;i++){
+    if(ms===eOff(7*(i+1))) return {colorKey:'white',icon:'🌅',name:osterNames[i],
+      banner:`✦ ${osterNames[i]} — Österliche Freudenzeit ✦`,greet:'Frohe Ostern',
+      desc:`${i+1}. Sonntag nach Ostern — österliche Freudenzeit.`};
+  }
+  // Christi Himmelfahrt = eOff(39)
+  if(ms===eOff(39)) return {colorKey:'white',icon:'☁️',name:'Christi Himmelfahrt',
+    banner:'✦ Christi Himmelfahrt — Er fuhr auf gen Himmel ✦',
+    greet:'Gesegnete Himmelfahrt',desc:'40. Tag nach Ostern — Auffahrt Christi.'};
+
+  // Werktage Osterzeit
+  if(ms>eMs&&ms<pentMs){
+    const rem=Math.round((pentMs-ms)/DAY);
+    return {colorKey:'white',icon:'🌅',name:'Osterzeit',
+      banner:'✦ Frohe Ostern — Christus ist auferstanden! ✦',greet:'Frohe Ostern',
+      desc:`Noch ${rem} Tag${rem===1?'':'e'} bis Pfingsten.`};
+  }
+
+  // ────────────────────────────────────────────────────────────────
+  // PFINGSTEN — ROT / Pfingstmontag — ROT / Trinitatis — WEISS
+  // ────────────────────────────────────────────────────────────────
+  if(ms===pentMs) return {colorKey:'red',icon:'🔥',name:'Pfingstsonntag',
+    banner:'✦ Pfingsten — Komm, Heiliger Geist ✦',greet:'Gesegnetes Pfingstfest',
+    desc:'50. Tag nach Ostern — Ausgießung des Heiligen Geistes.'};
+  if(ms===pfingstMo) return {colorKey:'red',icon:'🔥',name:'Pfingstmontag',
+    banner:'✦ Pfingstmontag — Der Geist weht, wo er will ✦',greet:'Gesegnetes Pfingstfest',
+    desc:'Pfingstmontag — erfüllt vom Heiligen Geist.'};
+  if(ms===trinMs) return {colorKey:'white',icon:'☁️',name:'Trinitatis',
+    banner:'✦ Trinitatis — Ehre sei dem dreieinigen Gott ✦',
+    greet:'Gesegneten Trinitatissonntag',desc:'Sonntag nach Pfingsten — Fest der Heiligen Dreifaltigkeit.'};
+
+  // ────────────────────────────────────────────────────────────────
+  // TRINITATISZEIT — GRÜN (mit Ausnahmen)
+  // ────────────────────────────────────────────────────────────────
+  if(ms>trinMs&&ms<=ewigkeitMs){
+    // Michaelis 29. September — WEISS
+    if(ms===michaelMs) return {colorKey:'white',icon:'⚔️',name:'Michaelis',
+      banner:'✦ Michaelis — Tag des Erzengels Michael ✦',greet:null,
+      desc:'29. September — Tag des Erzengels Michael und aller Engel.'};
+    // Erntedank — GRÜN
+    if(ms===erntedankMs) return {colorKey:'green',icon:'🌾',name:'Erntedankfest',
+      banner:'✦ Erntedankfest — Danket dem Herrn ✦',greet:null,
+      desc:'Erntedankfest — Dank für die Gaben der Schöpfung.'};
+    // Reformationstag 31. Oktober — ROT
+    if(ms===reformMs) return {colorKey:'red',icon:'🔑',name:'Reformationstag',
+      banner:'✦ Reformationstag — Allein die Gnade ✦',greet:'Gesegneten Reformationstag',
+      desc:'31. Oktober — Gedenken der Reformation durch Martin Luther.'};
+    // Israelsonntag (10. So nach Trinitatis) — VIOLETT (Gedenktag Zerstörung Jerusalems)
+    if(ms===israelMs) return {colorKey:'violet',icon:'✡️',name:'Israelsonntag',
+      banner:'✦ Israelsonntag — Gedenktag der Zerstörung Jerusalems ✦',greet:null,
+      desc:'10. Sonntag nach Trinitatis — Israelsonntag. Liturgische Farbe: Violett.'};
+    // Buß- und Bettag — VIOLETT
+    if(ms===bussbetMs) return {colorKey:'violet',icon:'🙏',name:'Buß- und Bettag',
+      banner:'✦ Buß- und Bettag — Kehret um zu mir ✦',greet:null,
+      desc:'Buß- und Bettag — Mittwoch vor dem Ewigkeitssonntag. Liturgische Farbe: Violett.'};
+    // Ewigkeitssonntag (letzter So im Kirchenjahr) — WEISS
+    if(ms===ewigkeitMs) return {colorKey:'white',icon:'🕊️',name:'Ewigkeitssonntag',
+      banner:'✦ Ewigkeitssonntag — Im Gedächtnis vor Gott ✦',greet:null,
+      desc:'Letzter Sonntag im Kirchenjahr — Gedenken der Verstorbenen in der Hoffnung auf Auferstehung.'};
+    // Alle übrigen Sonntage und Tage der Trinitatiszeit — GRÜN
+    const nTrin=Math.round((ms-trinMs)/DAY/7);
+    return {colorKey:'green',icon:'🌿',name:`${nTrin}. Sonntag nach Trinitatis`,
+      banner:null,greet:null,
+      desc:'Trinitatiszeit — Zeit des Wachsens und Reifens im Glauben.'};
+  }
+
+  // ────────────────────────────────────────────────────────────────
+  // ADVENTSZEIT — VIOLETT (mit Schnee-Atmosphäre)
+  // ────────────────────────────────────────────────────────────────
+  if(ms>=advMs){
+    // Adventssonntage benennen
+    const advWeek=Math.floor((ms-advMs)/DAY/7)+1;
+    const advName=advWeek<=4?`${advWeek}. Sonntag im Advent`:'Adventszeit';
+    return {colorKey:'advent',icon:'🕯️',name:advName,
+      banner:'✦ Adventszeit — Bereitet den Weg des Herrn ✦',greet:'Gesegnete Adventszeit',
+      desc:'Vier Wochen der Erwartung und Vorbereitung auf das Weihnachtsfest.'};
+  }
+
+  // Fallback grün
+  return {colorKey:'green',icon:'✝',name:'Gewöhnliche Zeit',banner:null,greet:null,
+    desc:'Zeit im Kirchenjahr — Alltag des Glaubens.'};
+}
+
+function renderKirchenjahrWidget(season){
+  const el=document.getElementById('kjWidget');
+  if(!el) return;
+  if(!season){
+    el.innerHTML=`<div class="kj-icon">✝</div><div><div class="kj-season">Gewöhnliche Zeit</div><div class="kj-desc">Die Zeit im Kirchenjahr außerhalb der besonderen Saisons.</div></div>`;
+  } else {
+    el.innerHTML=`<div class="kj-icon">${season.icon}</div><div><div class="kj-season">${season.name}</div><div class="kj-desc">${season.desc}</div></div>`;
+  }
+}
+
+function setTimeGreeting(season){
+  const h=new Date().getHours();
+  let greeting;
+  if(season&&season.greet){
+    greeting=season.greet;
+  } else if(h>=5&&h<10){greeting='Gesegneten Morgen';}
+  else if(h>=10&&h<12){greeting='Einen schönen Vormittag';}
+  else if(h>=12&&h<14){greeting='Gesegneten Mittag';}
+  else if(h>=14&&h<18){greeting='Einen gesegneten Nachmittag';}
+  else if(h>=18&&h<22){greeting='Gesegneten Abend';}
+  else{greeting='Gesegnete Nacht';}
+  const el=document.getElementById('heroPre');
+  if(el) el.textContent=greeting;
+}
+
+function detectSeason(){
+  const today=new Date();
+  const lit=getLiturgicalDay(today);
+  applyLiturgicalColor(lit.colorKey, lit.banner, lit.greet);
+  renderKirchenjahrWidget(lit);
+  setTimeGreeting(lit);
+}
+
+// ─── SCHNEE ───
+function startSnow(){
+  const canvas=document.getElementById('snow-canvas');
+  canvas.style.display='block';
+  const ctx=canvas.getContext('2d');
+  let flakes=[];
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+  for(let i=0;i<120;i++) flakes.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,r:Math.random()*3+1,speed:Math.random()*.6+.2,drift:Math.random()*.4-.2,opacity:Math.random()*.5+.2});
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='white';
+    for(const f of flakes){
+      ctx.globalAlpha=f.opacity;
+      ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();
+      f.y+=f.speed;f.x+=f.drift;
+      if(f.y>canvas.height){f.y=-5;f.x=Math.random()*canvas.width;}
+      if(f.x>canvas.width)f.x=0;
+      if(f.x<0)f.x=canvas.width;
+    }
+    ctx.globalAlpha=1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ─── KIRCHENGLOCKEN ───
+let bellEnabled=false;
+let bellAudioCtx=null;
+// Tracks last quarter triggered: "HH:MM" e.g. "14:45"
+let lastBellQuarter='';
+
+function initBell(){
+  const wrap=document.getElementById('bellWrap');
+  wrap.classList.add('visible');
+  updateBellTimeBadge();
+  // Check every 30 seconds
+  setInterval(()=>{
+    updateBellTimeBadge();
+    checkBellTime();
+  },30000);
+  checkBellTime();
+}
+
+function updateBellTimeBadge(){
+  const now=new Date();
+  const h=now.getHours();
+  const m=now.getMinutes();
+  // Calculate next quarter
+  const quarters=[0,15,30,45];
+  const nextM=quarters.find(q=>q>m);
+  const badge=document.getElementById('bellTimeBadge');
+  if(nextM!==undefined){
+    badge.textContent=String(h).padStart(2,'0')+':'+String(nextM).padStart(2,'0')+' Uhr';
+  } else {
+    const nextH=(h+1)%24;
+    badge.textContent=String(nextH).padStart(2,'0')+':00 Uhr';
+  }
+}
+
+function checkBellTime(){
+  if(!bellEnabled) return;
+  const now=new Date();
+  const h=now.getHours();
+  const m=now.getMinutes();
+  const s=now.getSeconds();
+  // Fire at :00, :15, :30, :45 within the first 30 seconds of that minute
+  const isQuarter=[0,15,30,45].includes(m)&&s<30;
+  const key=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  if(isQuarter&&key!==lastBellQuarter){
+    lastBellQuarter=key;
+    ringBells();
+  }
+}
+
+function toggleBell(){
+  bellEnabled=!bellEnabled;
+  const wrap=document.getElementById('bellWrap');
+  const icon=document.getElementById('bellIcon');
+  if(bellEnabled){
+    icon.textContent='🔔';
+    wrap.classList.add('ringing');
+    setTimeout(()=>wrap.classList.remove('ringing'),2400);
+    toast('Kirchenglocken aktiviert 🔔','ok');
+    playBellSound(3);
+  } else {
+    icon.textContent='🔕';
+    toast('Kirchenglocken deaktiviert','ok');
+  }
+}
+
+function ringBells(){
+  const wrap=document.getElementById('bellWrap');
+  const now=new Date();
+  const m=now.getMinutes();
+  // Full hour: ring h times (12h format); quarter hours: 1 strike
+  let strikes;
+  if(m===0){const h=now.getHours()%12;strikes=h===0?12:h;}
+  else{strikes=1;}
+  const duration=strikes*1800+1000;
+  wrap.classList.add('ringing');
+  setTimeout(()=>wrap.classList.remove('ringing'),duration);
+  playBellSound(strikes);
+}
+
+function playBellSound(times){
+  try{
+    if(!bellAudioCtx) bellAudioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const ctx=bellAudioCtx;
+    if(ctx.state==='suspended') ctx.resume();
+
+    // ── Master chain ──────────────────────────────────────────
+    const masterGain=ctx.createGain();
+    masterGain.gain.value=0.68;
+
+    // High shelf cut — real bells aren't bright, they're dark and warm
+    const warmth=ctx.createBiquadFilter();
+    warmth.type='highshelf';
+    warmth.frequency.value=3000;
+    warmth.gain.value=-9;
+    masterGain.connect(warmth);
+    warmth.connect(ctx.destination);
+
+    // ── Convolution reverb (impulse-response approximation) ───
+    // Build a synthetic IR: exponential decay with diffusion
+    const irLen=ctx.sampleRate*3.2;
+    const irBuf=ctx.createBuffer(2,irLen,ctx.sampleRate);
+    for(let ch=0;ch<2;ch++){
+      const d=irBuf.getChannelData(ch);
+      for(let i=0;i<irLen;i++){
+        // Diffuse early reflections + late reverb tail
+        const t=i/ctx.sampleRate;
+        const env=Math.exp(-t*1.1)*(1+0.6*Math.exp(-t*8));
+        d[i]=(Math.random()*2-1)*env;
+        // Add a few early reflection spikes
+        if(i===Math.floor(0.018*ctx.sampleRate)||i===Math.floor(0.035*ctx.sampleRate)||i===Math.floor(0.062*ctx.sampleRate))
+          d[i]+=(Math.random()*2-1)*0.6*Math.exp(-t*2);
+      }
+    }
+    const convolver=ctx.createConvolver();
+    convolver.buffer=irBuf;
+    const reverbGain=ctx.createGain(); reverbGain.gain.value=0.38;
+    const dryGain=ctx.createGain();    dryGain.gain.value=0.72;
+    convolver.connect(reverbGain); reverbGain.connect(masterGain);
+    dryGain.connect(masterGain);
+
+    // ── Bell strike ───────────────────────────────────────────
+    function strike(t){
+      // Physically accurate church bell partials
+      // Based on measurements of large German church bells (minor-third bell)
+      // Each partial: [frequency_ratio, amplitude, attack_s, decay_s, detune_cents]
+      const fund=196; // G3 — large church bell fundamental
+      const partials=[
+        // [ratio,   amp,   atk,   decay, detune_range]
+        [0.500,  0.32,  0.006, 8.5,   3 ],  // Hum (suboctave) — very long, subsonic feel
+        [1.000,  0.62,  0.003, 6.2,   2 ],  // Prime (fundamental)
+        [1.185,  0.38,  0.003, 4.4,   4 ],  // Minor third (tierce) — characteristic bell sound
+        [1.502,  0.26,  0.004, 3.8,   3 ],  // Perfect fifth (quint)
+        [2.000,  0.20,  0.003, 3.0,   2 ],  // Octave
+        [2.003,  0.08,  0.003, 2.8,   8 ],  // Octave (slightly detuned twin — chorus effect)
+        [2.756,  0.12,  0.004, 2.2,   5 ],  // Nominal upper partial
+        [3.011,  0.07,  0.004, 1.6,   6 ],  // Twelfth
+        [3.998,  0.05,  0.005, 1.1,   7 ],  // Double octave
+        [4.982,  0.03,  0.005, 0.7,   9 ],  // Upper partial
+        [5.915,  0.02,  0.005, 0.45,  12],  // High shimmer
+      ];
+
+      partials.forEach(([ratio,amp,atk,decay,drange])=>{
+        const osc=ctx.createOscillator();
+        const env=ctx.createGain();
+        osc.type='sine';
+        osc.frequency.value=fund*ratio;
+        // Natural inharmonicity — bells are never perfectly tuned
+        osc.detune.value=(Math.random()-0.5)*drange*2;
+
+        // Envelope: instant attack → initial peak → slow exponential decay
+        env.gain.setValueAtTime(0, t);
+        env.gain.linearRampToValueAtTime(amp, t+atk);
+        env.gain.setTargetAtTime(amp*0.55, t+atk, 0.03); // short sag
+        env.gain.exponentialRampToValueAtTime(0.00015, t+decay);
+
+        osc.connect(env);
+        env.connect(dryGain);
+        env.connect(convolver);
+        osc.start(t);
+        osc.stop(t+decay+0.05);
+      });
+
+      // ── Clapper impact — multi-layer transient ──
+      // Layer 1: broadband thud (wood/metal impact body)
+      const thudLen=Math.floor(ctx.sampleRate*0.055);
+      const thudBuf=ctx.createBuffer(1,thudLen,ctx.sampleRate);
+      const thudData=thudBuf.getChannelData(0);
+      for(let i=0;i<thudLen;i++){
+        const x=i/thudLen;
+        thudData[i]=(Math.random()*2-1)*Math.pow(1-x,2.5)*(0.8+0.4*Math.sin(i*0.8));
+      }
+      const thud=ctx.createBufferSource(); thud.buffer=thudBuf;
+      const thudFilt=ctx.createBiquadFilter();
+      thudFilt.type='lowpass'; thudFilt.frequency.value=520; thudFilt.Q.value=1.2;
+      const thudGain=ctx.createGain();
+      thudGain.gain.setValueAtTime(0.55,t);
+      thudGain.gain.exponentialRampToValueAtTime(0.0001,t+0.045);
+      thud.connect(thudFilt); thudFilt.connect(thudGain);
+      thudGain.connect(dryGain); thudGain.connect(convolver);
+      thud.start(t); thud.stop(t+0.06);
+
+      // Layer 2: metallic ring (high-freq clang)
+      const clangLen=Math.floor(ctx.sampleRate*0.03);
+      const clangBuf=ctx.createBuffer(1,clangLen,ctx.sampleRate);
+      const clangData=clangBuf.getChannelData(0);
+      for(let i=0;i<clangLen;i++) clangData[i]=(Math.random()*2-1)*Math.pow(1-i/clangLen,4);
+      const clang=ctx.createBufferSource(); clang.buffer=clangBuf;
+      const clangFilt=ctx.createBiquadFilter();
+      clangFilt.type='bandpass'; clangFilt.frequency.value=fund*4.8; clangFilt.Q.value=2.2;
+      const clangGain=ctx.createGain();
+      clangGain.gain.setValueAtTime(0.28,t);
+      clangGain.gain.exponentialRampToValueAtTime(0.0001,t+0.025);
+      clang.connect(clangFilt); clangFilt.connect(clangGain);
+      clangGain.connect(dryGain); clangGain.connect(convolver);
+      clang.start(t); clang.stop(t+0.035);
+
+      // Layer 3: very brief air thump (sub-bass punch on large bells)
+      const thumpOsc=ctx.createOscillator();
+      const thumpEnv=ctx.createGain();
+      thumpOsc.frequency.setValueAtTime(fund*0.35,t);
+      thumpOsc.frequency.exponentialRampToValueAtTime(fund*0.15,t+0.04);
+      thumpEnv.gain.setValueAtTime(0.18,t);
+      thumpEnv.gain.exponentialRampToValueAtTime(0.0001,t+0.04);
+      thumpOsc.connect(thumpEnv); thumpEnv.connect(dryGain);
+      thumpOsc.start(t); thumpOsc.stop(t+0.05);
+    }
+
+    const n=Math.min(times,12);
+    const spacing=times===1?0:(times<=3?2.4:2.1);
+    for(let i=0;i<n;i++) strike(ctx.currentTime+0.08+i*spacing);
+
+  } catch(e){ console.warn('Bell audio error:',e); }
+}
+
+// ─── TAGES-BIBELVERS ───
+const VERSES = [
+  {text:'„Denn wo zwei oder drei in meinem Namen versammelt sind, da bin ich mitten unter ihnen."',ref:'Matthäus 18,20'},
+  {text:'„Der Herr ist mein Hirte, mir wird nichts mangeln."',ref:'Psalm 23,1'},
+  {text:'„Ich bin der Weg, die Wahrheit und das Leben."',ref:'Johannes 14,6'},
+  {text:'„Liebe deinen Nächsten wie dich selbst."',ref:'Markus 12,31'},
+  {text:'„Bittet, so wird euch gegeben; suchet, so werdet ihr finden."',ref:'Matthäus 7,7'},
+  {text:'„Seid stark und unverzagt! Fürchtet euch nicht."',ref:'Josua 1,9'},
+  {text:'„Gott ist die Liebe; und wer in der Liebe bleibt, bleibt in Gott."',ref:'1. Johannes 4,16'},
+];
+function setDailyVerse(){
+  const d=new Date();
+  const idx=(d.getFullYear()*366+d.getMonth()*31+d.getDate())%VERSES.length;
+  const v=VERSES[idx];
+  document.getElementById('dvText').textContent=v.text;
+  document.getElementById('dvRef').textContent=v.ref;
+}
+
+// ─── AKTIVITÄTSLOG ───
+function logAction(action){
+  if(!S.user) return;
+  const now=new Date();
+  const time=now.toLocaleDateString('de-DE')+' '+now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  S.activityLog.unshift({time,actor:S.user.name,action});
+  if(S.activityLog.length>200) S.activityLog.pop();
+}
+function renderLog(){
+  const el=document.getElementById('logList');if(!el)return;
+  if(!S.activityLog.length){el.innerHTML='<div class="log-empty">Noch keine Aktivitäten aufgezeichnet.</div>';return;}
+  el.innerHTML=S.activityLog.map(l=>`<div class="log-item"><span class="log-time">${l.time}</span><span class="log-actor">${l.actor}</span><span class="log-action">${l.action}</span></div>`).join('');
+}
+
+// ─── PASSWORT TOGGLE ───
+function togglePass(inputId,btn){
+  const inp=document.getElementById(inputId);
+  if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
+  else{inp.type='password';btn.textContent='👁';}
+}
+
+// ─── NAV ───
+function sp(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('nav a[data-p]').forEach(a=>a.classList.toggle('active',a.dataset.p===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='kalender'){renderCalUpcoming();renderCountdown();}
+  if(id==='projekte') renderProjects();
+  if(id==='gottesdienst') renderPrayers();
+  if(id==='ueber'){renderHier();renderTeam();}
+  if(id==='start'){renderStats();renderPartners();}
+  if(id==='neuigkeiten') renderNews();
+  if(id==='galerie') renderGallery();
+  if(id==='messen') renderMintPublic();
+}
+
+// ─── AUTH ───
+function openModal(){document.getElementById('loginOverlay').classList.add('on');document.getElementById('lErr').classList.remove('on');}
+function closeModal(){document.getElementById('loginOverlay').classList.remove('on');}
+document.getElementById('loginOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+document.getElementById('lPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+async function doLogin(){
+  const u=document.getElementById('lUser').value.trim();
+  const p=document.getElementById('lPass').value;
+  try {
+    const res = await api('login', { login: u, pass: p });
+    authToken = res.token;
+    localStorage.setItem('kircheToken', authToken);
+    S.user = res.user;
+    document.getElementById('lUser').value='';
+    document.getElementById('lPass').value='';
+    closeModal();
+    updateAuth();
+    sp('admin');
+    toast('Willkommen, '+S.user.name+' ('+cap(S.user.role)+')','ok');
+  } catch(e) {
+    document.getElementById('lErr').classList.add('on');
+  }
+}
+async function doLogout(){
+  try { await api('logout'); } catch(e) {}
+  authToken=null; localStorage.removeItem('kircheToken');
+  S.user=null; updateAuth(); sp('start');
+}
+function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
+function updateAuth(){
+  const u=S.user;
+  document.getElementById('btnLogin').style.display=u?'none':'';
+  document.getElementById('btnLogout').style.display=u?'':'none';
+  const chip=document.getElementById('roleChip');
+  if(u){chip.classList.add('on');document.getElementById('rChipTxt').textContent=cap(u.role);}
+  else chip.classList.remove('on');
+  let al=document.getElementById('navAdmin');
+  if(u&&!al){al=document.createElement('a');al.id='navAdmin';al.dataset.p='admin';al.textContent='Verwaltung';al.style.color='var(--gold)';al.onclick=()=>sp('admin');document.getElementById('btnLogout').before(al);}
+  else if(!u&&al) al.remove();
+}
+
+// ─── TOAST ───
+let tt;
+function toast(msg,type='ok'){const t=document.getElementById('toast');t.className='toast '+type;t.textContent=(type==='ok'?'✓ ':'⚠ ')+msg;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),3000);}
+function flashOk(id){const e=document.getElementById(id);if(!e)return;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2500);toast('Gespeichert','ok');}
+
+// ─── HIERARCHY ───
+function renderHier(){
+  document.getElementById('hierList').innerHTML=S.hierarchy.map((h,i)=>`
+    <div class="hier-item">
+      <div class="hi-num">${i+1}</div>
+      <div class="hi-info"><h4>${h.rank}</h4><p>${h.desc}</p></div>
+      <span class="badge ${i===0?'b-gold':'b-blue'}">${h.rank}</span>
+    </div>`).join('');
+  renderHierAdm();
+}
+function renderHierAdm(){
+  const e=document.getElementById('hierAdm');if(!e)return;
+  e.innerHTML=S.hierarchy.map((h,i)=>`
+    <div class="hai">
+      <div class="hai-n">${i+1}</div>
+      <div class="hai-i"><h4>${h.rank}</h4><span>${h.desc}</span></div>
+      ${i>0?`<button class="ibtn" onclick="mvHier(${h.id},-1)">↑</button>`:'<button class="ibtn" style="opacity:.2" disabled>↑</button>'}
+      ${i<S.hierarchy.length-1?`<button class="ibtn" onclick="mvHier(${h.id},1)">↓</button>`:'<button class="ibtn" style="opacity:.2" disabled>↓</button>'}
+      <button class="ibtn del" onclick="delHier(${h.id})">✕</button>
+    </div>`).join('');
+}
+async function addHier(){
+  const r=document.getElementById('hRank').value.trim(),d=document.getElementById('hDesc').value.trim();
+  if(!r)return;
+  try{const item=await api('addHierarchy',{rank:r,desc:d});S.hierarchy.push(item);}catch(e){toast(e.message,'err');return;}
+  document.getElementById('hRank').value='';document.getElementById('hDesc').value='';
+  renderHierAdm();flashOk('hOk');
+}
+async function delHier(id){try{await api('delHierarchy',{id});S.hierarchy=S.hierarchy.filter(h=>h.id!==id);}catch(e){toast(e.message,'err');return;}renderHierAdm();toast('Rang entfernt');}
+async function mvHier(id,d){try{const res=await api('moveHierarchy',{id,dir:d});S.hierarchy=res;}catch(e){toast(e.message,'err');return;}renderHierAdm();}
+
+// ─── TEAM ───
+function renderTeam(){
+  document.getElementById('teamGrid').innerHTML=S.team.map(m=>`
+    <div class="team-card"><div class="t-av">${m.emoji}</div><div class="t-name">${m.name}</div><div class="t-role">${m.role}</div></div>`).join('');
+  renderTeamAdm();
+}
+function renderTeamAdm(){
+  const e=document.getElementById('teamTBody');if(!e)return;
+  e.innerHTML=S.team.map(m=>`<tr><td>${m.emoji} ${m.name}</td><td>${m.role}</td><td style="text-align:center">${m.emoji}</td><td><button class="btn btn-sm btn-del" onclick="delTeam(${m.id})">Entfernen</button></td></tr>`).join('');
+}
+async function addTeam(){
+  const n=document.getElementById('tmName').value.trim(),r=document.getElementById('tmRole').value.trim(),e=document.getElementById('tmEmoji').value.trim()||'👤';
+  if(!n||!r)return;
+  try{const item=await api('addTeam',{name:n,role:r,emoji:e});S.team.push(item);}catch(ex){toast(ex.message,'err');return;}
+  document.getElementById('tmName').value='';document.getElementById('tmRole').value='';document.getElementById('tmEmoji').value='';
+  renderTeamAdm();flashOk('tmOk');
+}
+async function delTeam(id){try{await api('delTeam',{id});S.team=S.team.filter(m=>m.id!==id);}catch(e){toast(e.message,'err');return;}renderTeamAdm();toast('Mitarbeiter entfernt');}
+
+// ─── PRAYERS ───
+let pFilter='alle';
+function filterP(btn,cat){document.querySelectorAll('.pfbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');pFilter=cat;renderPrayers();}
+function renderPrayers(){
+  const list=pFilter==='alle'?S.prayers:S.prayers.filter(p=>p.cat===pFilter);
+  document.getElementById('pCards').innerHTML=list.map(p=>`
+    <div class="pcard">
+      <div class="p-qm">❝</div>
+      <div class="p-cat">${p.cat}</div>
+      <div class="p-title">${p.title}</div>
+      <div class="p-text">${p.text}</div>
+      <div class="p-src">${p.src}</div>
+    </div>`).join('');
+}
+function renderPrayerAdm(){
+  const e=document.getElementById('pTBody');if(!e)return;
+  e.innerHTML=S.prayers.map(p=>`<tr><td>${p.title}</td><td><span class="badge b-gold">${p.cat}</span></td><td>${p.src}</td><td><button class="btn btn-sm btn-del" onclick="delPrayer(${p.id})">✕</button></td></tr>`).join('');
+}
+async function addPrayer(){
+  const t=document.getElementById('pTitle').value.trim(),c=document.getElementById('pCat').value,tx=document.getElementById('pText').value.trim(),s=document.getElementById('pSrc').value.trim();
+  if(!t||!tx)return;
+  try{const item=await api('addPrayer',{title:t,cat:c,text:tx,src:s});S.prayers.push(item);}catch(ex){toast(ex.message,'err');return;}
+  document.getElementById('pTitle').value='';document.getElementById('pText').value='';document.getElementById('pSrc').value='';
+  renderPrayerAdm();flashOk('pOk');
+}
+async function delPrayer(id){try{await api('delPrayer',{id});S.prayers=S.prayers.filter(p=>p.id!==id);}catch(e){toast(e.message,'err');return;}renderPrayerAdm();toast('Text entfernt');}
+
+// ─── NEUIGKEITEN ───
+function renderNews(){
+  const el=document.getElementById('newsGrid');
+  const em=document.getElementById('newsEmpty');
+  if(!S.news.length){el.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  const sorted=[...S.news].sort((a,b)=>(b.pin||0)-(a.pin||0)||(b.date>a.date?1:-1));
+  el.innerHTML=sorted.map(n=>`
+    <div class="news-card">
+      <div class="news-head">
+        <div class="news-meta">
+          <span class="news-date">📅 ${n.date}</span>
+          <span class="news-author">✝ ${n.author||'Kirchenführung'}</span>
+          ${n.pin?'<span class="news-pin">📌 Angepinnt</span>':''}
+        </div>
+      </div>
+      <div class="news-title">${n.title}</div>
+      <div class="news-body">${n.body}</div>
+    </div>`).join('');
+}
+function renderNewsAdm(){
+  const el=document.getElementById('newsAdmList');if(!el)return;
+  if(!S.news.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="tw"><table><thead><tr><th>Titel</th><th>Datum</th><th>Autor</th><th>Angepinnt</th><th></th></tr></thead><tbody>`
+    +S.news.map(n=>`<tr><td>${n.title}</td><td>${n.date}</td><td>${n.author||'—'}</td><td>${n.pin?'📌 Ja':'—'}</td><td><button class="btn btn-sm btn-del" onclick="delNews(${n.id})">✕</button></td></tr>`).join('')
+    +'</tbody></table></div>';
+}
+async function addNews(){
+  const t=document.getElementById('nwTitle').value.trim(),d=document.getElementById('nwDate').value,b=document.getElementById('nwBody').value.trim(),a=document.getElementById('nwAuthor').value.trim(),p=parseInt(document.getElementById('nwPin').value);
+  if(!t||!b)return;
+  const date=d||new Date().toISOString().slice(0,10);
+  try{const item=await api('addNews',{title:t,date,body:b,author:a||S.user?.name||'Kirchenführung',pin:p});S.news.push(item);}catch(ex){toast(ex.message,'err');return;}
+  document.getElementById('nwTitle').value='';document.getElementById('nwDate').value='';document.getElementById('nwBody').value='';document.getElementById('nwAuthor').value='';document.getElementById('nwPin').value='0';
+  renderNewsAdm();flashOk('nwOk');
+}
+async function delNews(id){try{await api('delNews',{id});S.news=S.news.filter(x=>x.id!==id);}catch(e){toast(e.message,'err');return;}renderNewsAdm();toast('Meldung entfernt');}
+
+// ─── GALERIE ───
+let galFilter='alle';
+let glImageData=null; // base64 of selected image
+
+function previewGalImage(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(file.size>10*1024*1024){toast('Bild zu groß (max. 10 MB)','err');input.value='';return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    glImageData=e.target.result;
+    const prev=document.getElementById('glPreview');
+    const wrap=document.getElementById('glPreviewWrap');
+    const label=document.getElementById('glDropLabel');
+    prev.src=glImageData;
+    wrap.style.display='block';
+    label.querySelector('div').textContent='📷 Bild ausgewählt — klicken zum Ändern';
+    document.getElementById('glFileErr').classList.remove('on');
+    // Auto-fill title from filename if empty
+    const titleEl=document.getElementById('glTitle');
+    if(!titleEl.value){
+      titleEl.value=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// Drag & drop support
+document.addEventListener('DOMContentLoaded',()=>{
+  const dz=document.getElementById('glDropzone');
+  if(!dz)return;
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.style.borderColor='var(--gold)';dz.style.background='rgba(200,168,75,.07)';});
+  dz.addEventListener('dragleave',()=>{dz.style.borderColor='';dz.style.background='';});
+  dz.addEventListener('drop',e=>{
+    e.preventDefault();dz.style.borderColor='';dz.style.background='';
+    const file=e.dataTransfer.files[0];
+    if(file&&file.type.startsWith('image/')){
+      const inp=document.getElementById('glFile');
+      // Create a DataTransfer to assign file to input
+      const dt=new DataTransfer();dt.items.add(file);inp.files=dt.files;
+      previewGalImage(inp);
+    }
+  });
+});
+
+function filterGal(btn,cat){document.querySelectorAll('.gallery-filter .pfbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');galFilter=cat;renderGallery();}
+
+function renderGallery(){
+  const el=document.getElementById('galGrid');
+  const em=document.getElementById('galEmpty');
+  const list=galFilter==='alle'?S.gallery:S.gallery.filter(g=>g.cat===galFilter);
+  if(!list.length){el.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  el.innerHTML=list.map(g=>`
+    <div class="gal-item" onclick="openLightbox(${g.id})">
+      <div class="gal-tag">${g.cat}</div>
+      ${g.img
+        ? `<img src="${g.img}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">`
+        : `<div class="gal-emoji">📸</div>`}
+      <div class="gal-overlay">
+        <div class="gal-title">${g.title}</div>
+        <div class="gal-cat">${g.cat}</div>
+      </div>
+    </div>`).join('');
+}
+
+function openLightbox(id){
+  const g=S.gallery.find(x=>x.id===id);if(!g)return;
+  const img=document.getElementById('lbImg');
+  img.src=g.img||'';
+  img.style.display=g.img?'block':'none';
+  document.getElementById('lbTitle').textContent=g.title;
+  document.getElementById('lbDesc').textContent=g.desc||'';
+  document.getElementById('lbDate').textContent=g.date||'';
+  document.getElementById('lightbox').classList.add('on');
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('on');}
+
+function renderGalleryAdm(){
+  const el=document.getElementById('galleryAdmList');if(!el)return;
+  if(!S.gallery.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="tw"><table><thead><tr><th>Vorschau</th><th>Titel</th><th>Kategorie</th><th>Datum</th><th></th></tr></thead><tbody>`
+    +S.gallery.map(g=>`<tr>
+      <td>${g.img?`<img src="${g.img}" style="width:48px;height:36px;object-fit:cover;border-radius:4px;border:1px solid var(--border)">`:'📸'}</td>
+      <td>${g.title}</td>
+      <td><span class="badge b-blue">${g.cat}</span></td>
+      <td>${g.date||'—'}</td>
+      <td><button class="btn btn-sm btn-del" onclick="delGalleryItem(${g.id})">✕</button></td>
+    </tr>`).join('')
+    +'</tbody></table></div>';
+}
+
+async function addGalleryItem(){
+  const t=document.getElementById('glTitle').value.trim();
+  const c=document.getElementById('glCat').value;
+  const d=document.getElementById('glDate').value;
+  const ds=document.getElementById('glDesc').value.trim();
+  if(!glImageData){document.getElementById('glFileErr').classList.add('on');return;}
+  if(!t)return;
+  try{const item=await api('addGallery',{title:t,cat:c,img:glImageData,date:d,desc:ds});S.gallery.push(item);}catch(ex){toast(ex.message,'err');return;}
+  glImageData=null;
+  document.getElementById('glTitle').value='';
+  document.getElementById('glDate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('glDesc').value='';
+  document.getElementById('glFile').value='';
+  document.getElementById('glPreviewWrap').style.display='none';
+  document.getElementById('glDropLabel').querySelector('div').textContent='📷';
+  renderGalleryAdm();flashOk('glOk');
+}
+
+async function delGalleryItem(id){
+  try{await api('delGallery',{id});S.gallery=S.gallery.filter(x=>x.id!==id);}catch(e){toast(e.message,'err');return;}
+  renderGalleryAdm();renderGallery();toast('Bild entfernt');
+}
+// ─── MESSINTENTIONEN ───
+const MN_SHORT=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+function renderMintPublic(){
+  const el=document.getElementById('mintPublicGrid');
+  const em=document.getElementById('mintPublicEmpty');
+  const list=S.messintentionen.filter(m=>m.pub);
+  if(!list.length){el.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  const sorted=[...list].sort((a,b)=>a.date>b.date?1:-1);
+  el.innerHTML=sorted.map(m=>{
+    const d=new Date(m.date);
+    return `<div class="mint-item">
+      <div class="mint-date-box">
+        <div class="mint-day">${d.getDate()}</div>
+        <div class="mint-mon">${MN_SHORT[d.getMonth()]}</div>
+      </div>
+      <div class="mint-info">
+        <h4>${m.title}</h4>
+        <div class="mint-sub">${m.time?m.time+' Uhr · ':''} ${m.celebrant||''}</div>
+        ${m.requester?`<div class="mint-req">Bestellt von: ${m.requester}</div>`:''}
+      </div>
+      <span class="mint-status ms-${m.status}">${m.status}</span>
+    </div>`;
+  }).join('');
+}
+function renderMintAdm(){
+  const el=document.getElementById('mintAdmList');if(!el)return;
+  if(!S.messintentionen.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="tw"><table><thead><tr><th>Datum</th><th>Intention</th><th>Bestellt von</th><th>Zelebrant</th><th>Status</th><th>Öffentl.</th><th></th></tr></thead><tbody>`
+    +S.messintentionen.map(m=>`<tr>
+      <td>${m.date}${m.time?' '+m.time:''}</td>
+      <td>${m.title}</td>
+      <td>${m.requester||'—'}</td>
+      <td>${m.celebrant||'—'}</td>
+      <td><span class="mint-status ms-${m.status}">${m.status}</span></td>
+      <td>${m.pub?'✓':'—'}</td>
+      <td>
+        <select onchange="changeMintStatus(${m.id},this.value)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:4px;padding:.2rem .4rem;font-size:.72rem">
+          <option ${m.status==='offen'?'selected':''} value="offen">Offen</option>
+          <option ${m.status==='gehalten'?'selected':''} value="gehalten">Gehalten</option>
+          <option ${m.status==='storniert'?'selected':''} value="storniert">Storniert</option>
+        </select>
+        <button class="btn btn-sm btn-del" onclick="delMint(${m.id})">✕</button>
+      </td>
+    </tr>`).join('')
+    +'</tbody></table></div>';
+}
+async function addMessintention(){
+  const d=document.getElementById('miDate').value,tm=document.getElementById('miTime').value,t=document.getElementById('miTitle').value.trim(),req=document.getElementById('miRequester').value.trim(),cel=document.getElementById('miCelebrant').value.trim(),st=document.getElementById('miStatus').value,pub=parseInt(document.getElementById('miPublic').value);
+  if(!d||!t)return;
+  try{const item=await api('addMessintention',{date:d,time:tm,title:t,requester:req,celebrant:cel,status:st,pub:pub===1});S.messintentionen.push(item);}catch(ex){toast(ex.message,'err');return;}
+  ['miDate','miTime','miTitle','miRequester','miCelebrant'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('miStatus').value='offen';document.getElementById('miPublic').value='1';
+  renderMintAdm();flashOk('miOk');
+}
+async function changeMintStatus(id,status){
+  try{await api('updateMessintentionStatus',{id,status});const m=S.messintentionen.find(x=>x.id===id);if(m)m.status=status;}catch(e){toast(e.message,'err');return;}
+  renderMintAdm();toast('Status aktualisiert','ok');
+}
+async function delMint(id){try{await api('delMessintention',{id});S.messintentionen=S.messintentionen.filter(x=>x.id!==id);}catch(e){toast(e.message,'err');return;}renderMintAdm();toast('Messintention entfernt');}
+
+// ─── PROJECTS ───
+function renderProjects(){
+  const g=document.getElementById('projGrid'),n=document.getElementById('noProj');
+  if(!S.projects.length){g.innerHTML='';n.style.display='block';return;}
+  n.style.display='none';
+  g.innerHTML=S.projects.map(p=>`
+    <div class="proj-card">
+      <div class="pc-head"><div class="pc-ic">${p.icon}</div><span class="pc-st s-${p.status}">${p.status}</span></div>
+      <div class="pc-title">${p.title}</div>
+      <div class="pc-desc">${p.desc}</div>
+      ${p.goal?`<div class="pc-goal">${p.goal}</div>`:''}
+      ${p.owner?`<div style="margin-top:.7rem;font-size:.73rem;color:var(--text3)">Verantwortlich: ${p.owner}</div>`:''}
+    </div>`).join('');
+}
+function renderProjAdm(){
+  const e=document.getElementById('projAdmList');if(!e)return;
+  e.innerHTML=!S.projects.length?'':
+    `<div class="tw"><table><thead><tr><th>Titel</th><th>Status</th><th>Verantwortlich</th><th></th></tr></thead><tbody>`
+    +S.projects.map(p=>`<tr><td>${p.icon} ${p.title}</td><td><span class="pc-st s-${p.status}" style="font-size:.65rem;padding:.18rem .5rem">${p.status}</span></td><td>${p.owner||'—'}</td><td><button class="btn btn-sm btn-del" onclick="delProject(${p.id})">✕</button></td></tr>`).join('')
+    +'</tbody></table></div>';
+}
+async function addProject(){
+  const t=document.getElementById('prTitle').value.trim(),st=document.getElementById('prStatus').value,d=document.getElementById('prDesc').value.trim(),g=document.getElementById('prGoal').value.trim(),ic=document.getElementById('prIcon').value.trim()||'✝',o=document.getElementById('prOwner').value.trim();
+  if(!t)return;
+  try{const item=await api('addProject',{title:t,status:st,desc:d,goal:g,icon:ic,owner:o});S.projects.push(item);}catch(ex){toast(ex.message,'err');return;}
+  ['prTitle','prDesc','prGoal','prIcon','prOwner'].forEach(i=>{document.getElementById(i).value='';});
+  renderProjAdm();flashOk('prOk');
+}
+async function delProject(id){try{await api('delProject',{id});S.projects=S.projects.filter(p=>p.id!==id);}catch(e){toast(e.message,'err');return;}renderProjAdm();toast('Projekt entfernt');}
+
+// ─── PARTNERS ───
+function renderPartners(){
+  const el=document.getElementById('partnersGrid');if(!el)return;
+  if(!S.partners.length){el.innerHTML='<div class="no-partners">Noch keine Partner eingetragen.</div>';return;}
+  el.innerHTML=S.partners.map(p=>`
+    <div class="partner-card">
+      <div class="partner-logo">${p.logo}</div>
+      <div><div class="partner-name">${p.name}</div><div class="partner-type">${p.type}</div></div>
+    </div>`).join('');
+}
+function renderPartnerAdm(){
+  const el=document.getElementById('partnerAdmList');if(!el)return;
+  if(!S.partners.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="tw"><table><thead><tr><th>Logo</th><th>Name</th><th>Art</th><th></th></tr></thead><tbody>`
+    +S.partners.map(p=>`<tr><td style="font-size:1.3rem">${p.logo}</td><td>${p.name}</td><td>${p.type}</td><td><button class="btn btn-sm btn-del" onclick="delPartner(${p.id})">✕</button></td></tr>`).join('')
+    +'</tbody></table></div>';
+}
+async function addPartner(){
+  const n=document.getElementById('ptName').value.trim(),t=document.getElementById('ptType').value.trim(),l=document.getElementById('ptLogo').value.trim()||'🏛️';
+  if(!n)return;
+  try{const item=await api('addPartner',{name:n,type:t,logo:l});S.partners.push(item);}catch(ex){toast(ex.message,'err');return;}
+  document.getElementById('ptName').value='';document.getElementById('ptType').value='';document.getElementById('ptLogo').value='';
+  renderPartnerAdm();renderPartners();flashOk('ptOk');
+}
+async function delPartner(id){try{await api('delPartner',{id});S.partners=S.partners.filter(x=>x.id!==id);}catch(e){toast(e.message,'err');return;}renderPartnerAdm();renderPartners();toast('Partner entfernt');}
+
+// ─── STATISTIKEN ───
+function renderStats(){
+  const el=document.getElementById('statsGrid');if(!el)return;
+  const items=[
+    {num:S.stats.members,lbl:'Mitglieder',icon:'👥'},
+    {num:S.stats.services,lbl:'Gottesdienste',icon:'⛪'},
+    {num:S.stats.donations>0?'€'+S.stats.donations.toLocaleString('de-DE'):0,lbl:'Spenden gesammelt',icon:'🙏'},
+    {num:S.stats.projects,lbl:'Projekte abgeschlossen',icon:'✅'},
+  ];
+  el.innerHTML=items.map(i=>`<div class="stat-card"><div class="stat-num">${i.num||'—'}</div><div class="stat-lbl">${i.icon} ${i.lbl}</div></div>`).join('');
+}
+async function saveStats(){
+  S.stats.members=parseInt(document.getElementById('stMembers').value)||0;
+  S.stats.services=parseInt(document.getElementById('stServices').value)||0;
+  S.stats.donations=parseInt(document.getElementById('stDonations').value)||0;
+  S.stats.projects=parseInt(document.getElementById('stProjects').value)||0;
+  try{await api('saveStats',S.stats);}catch(ex){toast(ex.message,'err');return;}
+  renderStats();flashOk('stOk');
+}
+
+// ─── CALENDAR ───
+const MN=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+const RECUR_ICONS={einmalig:'',täglich:'🔁 Täglich',wöchentlich:'🔁 Wöchentlich',monatlich:'🔁 Monatlich',jährlich:'🔁 Jährlich'};
+const TYPE_COLORS={
+  'Gottesdienst':'background:rgba(200,168,75,.1);color:var(--gold);border:1px solid rgba(200,168,75,.22)',
+  'Messintention':'background:rgba(106,174,255,.1);color:var(--blue);border:1px solid rgba(106,174,255,.2)',
+  'Beerdigung':'background:rgba(90,84,72,.2);color:var(--text3);border:1px solid var(--border)',
+  'Hochzeit':'background:rgba(92,191,122,.1);color:var(--green);border:1px solid rgba(92,191,122,.22)',
+  'Veranstaltung':'background:rgba(200,168,75,.1);color:var(--gold2);border:1px solid rgba(200,168,75,.15)',
+  'Sonstiges':'background:rgba(255,255,255,.04);color:var(--text2);border:1px solid var(--border)',
+};
+function getUpcomingEvents(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const results=[];
+  for(const ev of S.calEvents){
+    const base=new Date(ev.date);base.setHours(0,0,0,0);
+    if(ev.recur==='einmalig'||!ev.recur){
+      if(base>=today) results.push({...ev,_sort:base.getTime()});
+    } else {
+      let cur=new Date(base);let count=0;
+      while(count<8){
+        if(cur>=today){results.push({...ev,date:cur.toISOString().slice(0,10),_sort:cur.getTime()});count++;}
+        if(ev.recur==='täglich') cur.setDate(cur.getDate()+1);
+        else if(ev.recur==='wöchentlich') cur.setDate(cur.getDate()+7);
+        else if(ev.recur==='monatlich') cur.setMonth(cur.getMonth()+1);
+        else if(ev.recur==='jährlich') cur.setFullYear(cur.getFullYear()+1);
+        else break;
+        if(cur.getFullYear()>today.getFullYear()+2) break;
+      }
+    }
+  }
+  return results.sort((a,b)=>a._sort-b._sort).slice(0,20);
+}
+function renderCalUpcoming(){
+  const el=document.getElementById('calUpcoming');if(!el)return;
+  const evs=getUpcomingEvents();
+  if(!evs.length){el.innerHTML='<div class="no-events">Keine bevorstehenden Termine eingetragen.</div>';return;}
+  const groups={};
+  for(const ev of evs){const d=new Date(ev.date);const key=MN[d.getMonth()]+' '+d.getFullYear();if(!groups[key])groups[key]=[];groups[key].push(ev);}
+  let html='';
+  for(const [month,evList] of Object.entries(groups)){
+    html+=`<div class="cal-upcoming-title">${month}</div><div class="cal-ev-big">`;
+    for(const ev of evList){
+      const d=new Date(ev.date);
+      const style=TYPE_COLORS[ev.type]||TYPE_COLORS['Sonstiges'];
+      const recurLabel=ev.recur&&ev.recur!=='einmalig'?`<span class="cev-recur">${RECUR_ICONS[ev.recur]||ev.recur}</span>`:'';
+      html+=`<div class="cev-big">
+        <div class="cev-date-box"><div class="cev-day">${d.getDate()}</div><div class="cev-mon">${MN_SHORT[d.getMonth()]}</div></div>
+        <div class="cev-info"><h4>${ev.title}</h4><div class="cev-meta">${ev.time?`<span>🕐 ${ev.time} Uhr</span>`:''}</div>${recurLabel}${ev.desc?`<div class="cev-desc-text">${ev.desc}</div>`:''}</div>
+        <span class="cev-type-badge" style="${style}">${ev.type}</span>
+      </div>`;
+    }
+    html+='</div>';
+  }
+  el.innerHTML=html;
+}
+async function addCalEv(){
+  const dt=document.getElementById('cDate').value,tm=document.getElementById('cTime').value,tp=document.getElementById('cType').value,tl=document.getElementById('cTitle').value.trim(),ds=document.getElementById('cDesc').value.trim(),rc=document.getElementById('cRecur').value;
+  if(!dt||!tl)return;
+  try{const item=await api('addCalEvent',{date:dt,time:tm,type:tp,title:tl,desc:ds,recur:rc});S.calEvents.push(item);}catch(ex){toast(ex.message,'err');return;}
+  document.getElementById('cDate').value='';document.getElementById('cTime').value='';document.getElementById('cTitle').value='';document.getElementById('cDesc').value='';document.getElementById('cRecur').value='einmalig';
+  renderCalAdm();flashOk('cOk');
+}
+function renderCalAdm(){
+  const e=document.getElementById('calAdmList');if(!e)return;
+  if(!S.calEvents.length){e.innerHTML='';return;}
+  e.innerHTML=`<div class="tw"><table><thead><tr><th>Datum</th><th>Art</th><th>Titel</th><th>Zeit</th><th>Wiederh.</th><th></th></tr></thead><tbody>`
+    +[...S.calEvents].sort((a,b)=>a.date>b.date?1:-1).map(ev=>`<tr><td>${ev.date}</td><td><span class="badge b-gold">${ev.type}</span></td><td>${ev.title}</td><td>${ev.time||'—'}</td><td style="color:var(--text3)">${ev.recur||'einmalig'}</td><td><button class="btn btn-sm btn-del" onclick="delCalEv(${ev.id})">✕</button></td></tr>`).join('')
+    +'</tbody></table></div>';
+}
+async function delCalEv(id){try{await api('delCalEvent',{id});S.calEvents=S.calEvents.filter(e=>e.id!==id);}catch(e){toast(e.message,'err');return;}renderCalAdm();toast('Termin entfernt');}
+
+// ─── PAGE EDITOR ───
+const PD={
+  start:{label:'Startseite',fields:[{k:'tagline',l:'Tagline',t:'text'}]},
+  ueber:{label:'Über uns',fields:[{k:'lead',l:'Einleitung',t:'text'},{k:'mission',l:'Mission',t:'ta'},{k:'werte',l:'Werte',t:'ta'}]},
+  spenden:{label:'Spenden',fields:[{k:'title',l:'Überschrift',t:'text'},{k:'text1',l:'Erster Absatz',t:'ta'},{k:'text2',l:'Zweiter Absatz',t:'ta'},{k:'verwendung',l:'Verwendung der Spenden',t:'ta'}]}
+};
+let editPg=null;
+function selPage(btn,id){
+  document.querySelectorAll('.pg-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');editPg=id;
+  const def=PD[id],c=S.pages[id];
+  document.getElementById('pgEdTitle').textContent='✏️ '+def.label;
+  document.getElementById('pgEdFields').innerHTML=def.fields.map(f=>`<div class="fg"><label>${f.l}</label>${f.t==='ta'?`<textarea id="ef_${f.k}" rows="4">${(c[f.k]||'')}</textarea>`:`<input type="text" id="ef_${f.k}" value="${(c[f.k]||'').replace(/"/g,'&quot;')}">`}</div>`).join('');
+  document.getElementById('pgEditorForm').style.display='block';document.getElementById('pgSaveOk').classList.remove('on');
+}
+async function savePgEdit(){
+  if(!editPg)return;
+  PD[editPg].fields.forEach(f=>{const e=document.getElementById('ef_'+f.k);if(e)S.pages[editPg][f.k]=e.value;});
+  try{await api('savePages',{pages:S.pages});}catch(ex){toast(ex.message,'err');return;}
+  applyPg(editPg);flashOk('pgSaveOk');
+}
+function applyPg(id){
+  const c=S.pages[id];
+  if(id==='start'){let e=document.getElementById('hTag');if(e)e.textContent=c.tagline;}
+  if(id==='ueber'){['uLead','uMission','uWerte'].forEach((eid,i)=>{const keys=['lead','mission','werte'];const e=document.getElementById(eid);if(e)e.textContent=c[keys[i]];});}
+  if(id==='spenden'){[['sTitle','title'],['sText1','text1'],['sText2','text2'],['sVerwendung','verwendung']].forEach(([eid,k])=>{const e=document.getElementById(eid);if(e)e.textContent=c[k];});}
+}
+function cancelPgEdit(){editPg=null;document.getElementById('pgEditorForm').style.display='none';document.querySelectorAll('.pg-btn').forEach(b=>b.classList.remove('sel'));}
+
+// ─── USERS ───
+function renderUsers(){
+  const e=document.getElementById('usersTBody');if(!e)return;
+  e.innerHTML=S.accounts.map(a=>`<tr><td>${a.name}</td><td>${a.login}</td><td><span class="badge ${a.role==='priester'?'b-gold':'b-blue'}">${cap(a.role)}</span></td><td>${a.created}</td><td>${a.id>2?`<button class="btn btn-sm btn-del" onclick="delUser(${a.id})">Entfernen</button>`:'<span style="color:var(--text3);font-size:.72rem">Kern</span>'}</td></tr>`).join('');
+}
+async function createUser(){
+  const n=document.getElementById('uName').value.trim(),r=document.getElementById('uRole').value,l=document.getElementById('uLogin').value.trim(),p=document.getElementById('uPass').value;
+  if(!n||!r||!l||!p)return;
+  try{const u=await api('createUser',{name:n,role:r,login:l,pass:p});S.accounts.push(u);}catch(ex){toast(ex.message,'err');return;}
+  ['uName','uLogin','uPass'].forEach(i=>document.getElementById(i).value='');document.getElementById('uRole').value='';
+  renderUsers();flashOk('uOk');
+}
+async function delUser(id){try{await api('delUser',{id});S.accounts=S.accounts.filter(a=>a.id!==id);}catch(e){toast(e.message,'err');return;}renderUsers();toast('Benutzer entfernt');}
+
+// ─── DASHBOARD ───
+function renderDashboard(){
+  // KPIs
+  const upcoming=getUpcomingEvents();
+  const kpis=[
+    {icon:'📅',num:upcoming.length,lbl:'Bevorstehende Termine'},
+    {icon:'📰',num:S.news.length,lbl:'Neuigkeiten'},
+    {icon:'📸',num:S.gallery.length,lbl:'Galeriebilder'},
+    {icon:'🕯️',num:S.messintentionen.filter(m=>m.status==='offen').length,lbl:'Offene Messen'},
+    {icon:'🎯',num:S.projects.filter(p=>p.status==='aktiv').length,lbl:'Aktive Projekte'},
+    {icon:'🤝',num:S.partners.length,lbl:'Partner'},
+  ];
+  document.getElementById('dashKpis').innerHTML=kpis.map(k=>`
+    <div class="dash-kpi">
+      <div class="dash-kpi-icon">${k.icon}</div>
+      <div class="dash-kpi-num">${k.num}</div>
+      <div class="dash-kpi-lbl">${k.lbl}</div>
+    </div>`).join('');
+  // Next events
+  const evEl=document.getElementById('dashEvents');
+  const nextEvs=upcoming.slice(0,6);
+  if(!nextEvs.length){evEl.innerHTML='<div class="dash-empty">Keine bevorstehenden Termine.</div>';}
+  else{evEl.innerHTML=nextEvs.map(ev=>{const d=new Date(ev.date);return`<div class="dash-ev-item"><div class="dash-ev-day">${d.getDate()}.<br><span style="font-size:.6rem;color:var(--text3)">${MN_SHORT[d.getMonth()]}</span></div><div><div class="dash-ev-info">${ev.title}</div><div class="dash-ev-type">${ev.type}${ev.time?' · '+ev.time:''}</div></div></div>`;}).join('');}
+  // Recent log
+  const lgEl=document.getElementById('dashLog');
+  const recent=S.activityLog.slice(0,8);
+  if(!recent.length){lgEl.innerHTML='<div class="dash-empty">Noch keine Aktivitäten.</div>';}
+  else{lgEl.innerHTML=recent.map(l=>`<div class="dash-log-item"><span class="dash-log-time">${l.time.split(' ')[1]||l.time}</span><span class="dash-log-actor">${l.actor.split(' ').pop()}</span><span class="dash-log-act">${l.action}</span></div>`).join('');}
+}
+
+// ─── ADMIN SWITCH ───
+function sap(id){
+  document.querySelectorAll('.adm-panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.adm-side a').forEach(a=>a.classList.remove('on'));
+  document.getElementById('ap-'+id).classList.add('on');
+  document.getElementById('as-'+id).classList.add('on');
+  if(id==='dashboard') renderDashboard();
+  if(id==='users') renderUsers();
+  if(id==='hierarchy'){renderHier();renderHierAdm();}
+  if(id==='team') renderTeamAdm();
+  if(id==='prayers') renderPrayerAdm();
+  if(id==='projects') renderProjAdm();
+  if(id==='calendar') renderCalAdm();
+  if(id==='partners') renderPartnerAdm();
+  if(id==='news') renderNewsAdm();
+  if(id==='gallery') renderGalleryAdm();
+  if(id==='messintentionen') renderMintAdm();
+  if(id==='seasonpreview'){document.querySelectorAll('#ap-seasonpreview .pg-btn').forEach(b=>b.classList.remove('sel'));}
+  if(id==='kirchenbuch'){renderKbList();const n=new Date(),pad=x=>String(x).padStart(2,'0');const t=`${n.getFullYear()}-${pad(n.getMonth()+1)}-${pad(n.getDate())}`;const e=document.getElementById('kbDate');if(e)e.value=t;}
+  if(id==='log') renderLog();
+  if(id==='stats'){
+    document.getElementById('stMembers').value=S.stats.members||'';
+    document.getElementById('stServices').value=S.stats.services||'';
+    document.getElementById('stDonations').value=S.stats.donations||'';
+    document.getElementById('stProjects').value=S.stats.projects||'';
+  }
+}
+
+// ─── KIRCHENBUCH ───
+const KB_ICONS={taufe:'💧',hochzeit:'💍',beerdigung:'🕯️'};
+let kbFilter='alle';
+
+function filterKb(btn,cat){
+  document.querySelectorAll('#kbFilterBar .pfbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');kbFilter=cat;renderKbList();
+}
+
+function renderKbList(){
+  const el=document.getElementById('kbList');if(!el)return;
+  const list=kbFilter==='alle'?S.kirchenbuch:S.kirchenbuch.filter(e=>e.type===kbFilter);
+  const sorted=[...list].sort((a,b)=>b.date>a.date?1:-1);
+  if(!sorted.length){el.innerHTML='<div class="kb-empty">Noch keine Einträge im Kirchenbuch.</div>';return;}
+  el.innerHTML=sorted.map(e=>`
+    <div class="kb-item">
+      <div class="kb-icon">${KB_ICONS[e.type]||'📜'}</div>
+      <div class="kb-info">
+        <h4>${e.name}</h4>
+        <div class="kb-meta">
+          <span>📅 ${e.date}</span>
+          ${e.ort?`<span>📍 ${e.ort}</span>`:''}
+          ${e.celebrant?`<span>✝ ${e.celebrant}</span>`:''}
+        </div>
+        ${e.note?`<div class="kb-note">${e.note}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.5rem">
+        <span class="kb-type kb-${e.type}">${e.type}</span>
+        <button class="btn btn-sm btn-del" onclick="delKbEntry(${e.id})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addKbEntry(){
+  const t=document.getElementById('kbType').value;
+  const d=document.getElementById('kbDate').value;
+  const n=document.getElementById('kbName').value.trim();
+  const o=document.getElementById('kbOrt').value.trim();
+  const c=document.getElementById('kbCelebrant').value.trim();
+  const nt=document.getElementById('kbNote').value.trim();
+  if(!d||!n)return;
+  try{const item=await api('addKirchenBuch',{type:t,date:d,name:n,ort:o,celebrant:c,note:nt});S.kirchenbuch.push(item);}catch(ex){toast(ex.message,'err');return;}
+  ['kbName','kbOrt','kbCelebrant','kbNote'].forEach(i=>document.getElementById(i).value='');
+  renderKbList();flashOk('kbOk');
+}
+
+async function delKbEntry(id){
+  try{await api('delKirchenBuch',{id});S.kirchenbuch=S.kirchenbuch.filter(x=>x.id!==id);}catch(e){toast(e.message,'err');return;}
+  renderKbList();toast('Eintrag entfernt');
+}
+
+// ─── KIRCHENJAHR VORSCHAU ───
+const SEASON_PRESETS={
+  advent:     {colorKey:'advent',   icon:'🕯️',name:'Adventszeit',          banner:'✦ Adventszeit — Bereitet den Weg des Herrn ✦',           greet:'Gesegnete Adventszeit',     desc:'Vier Wochen der Erwartung. Liturgische Farbe: Violett.'},
+  christmas:  {colorKey:'christmas',icon:'⭐', name:'Weihnachtszeit',        banner:'✦ Frohe Weihnachten — Frieden sei mit euch ✦',            greet:'Frohe Weihnachten',         desc:'Heiligabend bis Epiphanias. Liturgische Farbe: Weiß.'},
+  epiphanias: {colorKey:'white',    icon:'✨', name:'Zeit nach Epiphanias',  banner:null,                                                       greet:null,                        desc:'Sonntage nach Epiphanias. Liturgische Farbe: Weiß (seit 2019).'},
+  vorfasten:  {colorKey:'green',    icon:'🌿',name:'Vorfastenzeit',          banner:null,                                                       greet:null,                        desc:'Sexagesimae / Estomihi. Liturgische Farbe: Grün.'},
+  lent:       {colorKey:'violet',   icon:'🕊️',name:'Passionszeit',          banner:'✦ Passionszeit — Umkehr und Erneuerung ✦',                greet:'Gesegnete Passionszeit',    desc:'Invokavit bis Judika. Liturgische Farbe: Violett.'},
+  palmsonntag:{colorKey:'red',      icon:'🌿',name:'Palmsonntag',            banner:'✦ Palmsonntag — Hosianna dem Sohn Davids ✦',              greet:'Gesegneten Palmsonntag',    desc:'6. Passionssonntag. Liturgische Farbe: Rot.'},
+  gruend:     {colorKey:'white',    icon:'🍞',name:'Gründonnerstag',         banner:'✦ Gründonnerstag — Einsetzung des Abendmahls ✦',          greet:'Gesegneten Gründonnerstag', desc:'Abendmahl-Einsetzung. Liturgische Farbe: Weiß.'},
+  karfreitag: {colorKey:'black',    icon:'✝', name:'Karfreitag',             banner:'✦ Karfreitag — Er trug unsere Schuld ✦',                  greet:'Stiller Karfreitag',        desc:'Kreuzigung Christi. Liturgische Farbe: Schwarz.'},
+  karsamstag: {colorKey:'black',    icon:'🕯️',name:'Karsamstag',            banner:'✦ Karsamstag — Die Stille des Grabes ✦',                  greet:'Stiller Karsamstag',        desc:'Tag der Grabesruhe. Liturgische Farbe: Schwarz.'},
+  easter:     {colorKey:'white',    icon:'🌅',name:'Osterzeit',              banner:'✦ Frohe Ostern — Christus ist auferstanden! ✦',           greet:'Frohe Ostern',              desc:'Ostern bis Exaudi. Liturgische Farbe: Weiß.'},
+  himmelfahrt:{colorKey:'white',    icon:'☁️',name:'Christi Himmelfahrt',   banner:'✦ Christi Himmelfahrt — Er fuhr auf gen Himmel ✦',        greet:'Gesegnete Himmelfahrt',     desc:'40. Tag nach Ostern. Liturgische Farbe: Weiß.'},
+  pentecost:  {colorKey:'red',      icon:'🔥',name:'Pfingsten',              banner:'✦ Pfingsten — Komm, Heiliger Geist ✦',                    greet:'Gesegnetes Pfingstfest',    desc:'Ausgießung des Heiligen Geistes. Liturgische Farbe: Rot.'},
+  trinitatis: {colorKey:'white',    icon:'☁️',name:'Trinitatis',             banner:'✦ Trinitatis — Ehre sei dem dreieinigen Gott ✦',          greet:'Gesegneten Trinitatissonntag',desc:'Sonntag nach Pfingsten. Liturgische Farbe: Weiß.'},
+  trinitat:   {colorKey:'green',    icon:'🌿',name:'Trinitatiszeit',         banner:null,                                                       greet:null,                        desc:'1.–27. So nach Trinitatis. Liturgische Farbe: Grün.'},
+  israel:     {colorKey:'violet',   icon:'✡️',name:'Israelsonntag',          banner:'✦ Israelsonntag — Gedenktag der Zerstörung Jerusalems ✦', greet:null,                        desc:'10. So nach Trinitatis. Liturgische Farbe: Violett.'},
+  michaelis:  {colorKey:'white',    icon:'⚔️',name:'Michaelis',              banner:'✦ Michaelis — Tag des Erzengels Michael ✦',               greet:null,                        desc:'29. September. Liturgische Farbe: Weiß.'},
+  erntedank:  {colorKey:'green',    icon:'🌾',name:'Erntedankfest',          banner:'✦ Erntedankfest — Danket dem Herrn ✦',                    greet:null,                        desc:'1. Sonntag im Oktober. Liturgische Farbe: Grün.'},
+  reformatio: {colorKey:'red',      icon:'🔑',name:'Reformationstag',        banner:'✦ Reformationstag — Allein die Gnade ✦',                  greet:'Gesegneten Reformationstag',desc:'31. Oktober. Liturgische Farbe: Rot.'},
+  bussbet:    {colorKey:'violet',   icon:'🙏',name:'Buß- und Bettag',        banner:'✦ Buß- und Bettag — Kehret um zu mir ✦',                  greet:null,                        desc:'Mi vor Ewigkeitssonntag. Liturgische Farbe: Violett.'},
+  ewigkeit:   {colorKey:'white',    icon:'🕊️',name:'Ewigkeitssonntag',       banner:'✦ Ewigkeitssonntag — Im Gedächtnis vor Gott ✦',           greet:null,                        desc:'Letzter So im Kirchenjahr. Liturgische Farbe: Weiß.'},
+};
+let snowRunning=false;
+
+function applySeasonVisuals(colorKey, season){
+  if(!colorKey||colorKey==='none'){
+    applyLiturgicalColor('green',null,null);
+    renderKirchenjahrWidget(null);
+    setTimeGreeting(null);
+    return;
+  }
+  applyLiturgicalColor(colorKey, season?season.banner:null, season?season.greet:null);
+  renderKirchenjahrWidget(season||null);
+  setTimeGreeting(season||null);
+}
+
+function previewSeason(key){
+  // highlight selected button
+  document.querySelectorAll('#ap-seasonpreview .pg-btn').forEach(b=>b.classList.remove('sel'));
+  event.currentTarget.classList.add('sel');
+
+  if(key==='auto'){
+    detectSeason();
+    document.getElementById('spActiveName').textContent='Automatisch (echtes Datum)';
+    toast('Echtes Datum wiederhergestellt','ok');
+    return;
+  }
+  if(key==='none'){
+    applySeasonVisuals(null,null);
+    document.getElementById('spActiveName').textContent='Gewöhnliche Zeit';
+    toast('Gewöhnliche Zeit aktiv','ok');
+    return;
+  }
+  const preset=SEASON_PRESETS[key];
+  if(!preset) return;
+  applySeasonVisuals(preset.colorKey, preset);
+  document.getElementById('spActiveName').textContent=preset.name;
+  toast('Vorschau: '+preset.name,'ok');
+}
+
+// ─── COUNTDOWN ───
+let countdownInterval=null;
+
+function getNextService(){
+  const now=new Date();
+  const upcoming=getUpcomingEvents();
+  // Prefer Gottesdienst/Messintention, fall back to any event
+  const services=upcoming.filter(e=>e.type==='Gottesdienst'||e.type==='Messintention');
+  const next=services.length?services[0]:upcoming[0];
+  return next||null;
+}
+
+function renderCountdown(){
+  const el=document.getElementById('countdownBox');
+  if(!el) return;
+  const ev=getNextService();
+  if(!ev){
+    el.innerHTML=`<div class="countdown-wrap"><div class="cd-inner"><div class="cd-eyebrow">Nächster Gottesdienst</div><div class="cd-empty">Derzeit keine Termine eingetragen.</div></div></div>`;
+    return;
+  }
+  const [y,m,d]=ev.date.split('-').map(Number);
+  const [h,min]=(ev.time||'09:00').split(':').map(Number);
+  const target=new Date(y,m-1,d,h,min,0);
+
+  function tick(){
+    const cdEl=document.getElementById('countdownBox');
+    if(!cdEl){clearInterval(countdownInterval);return;}
+    const diff=target-new Date();
+    if(diff<=0){
+      cdEl.innerHTML=`<div class="countdown-wrap"><div class="cd-inner">
+        <div class="cd-eyebrow">Jetzt</div>
+        <div class="cd-title">${ev.title}</div>
+        <div class="cd-started">✝ Gottesdienst hat begonnen</div>
+      </div></div>`;
+      clearInterval(countdownInterval);
+      return;
+    }
+    const pad=n=>String(n).padStart(2,'0');
+    const totalSecs=Math.floor(diff/1000);
+    const days=Math.floor(totalSecs/86400);
+    const hrs=Math.floor((totalSecs%86400)/3600);
+    const mins=Math.floor((totalSecs%3600)/60);
+    const secs=totalSecs%60;
+    const dateStr=target.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'})+(ev.time?' · '+ev.time+' Uhr':'');
+    const dayBlock=days>0?`
+      <div class="cd-block"><span class="cd-num">${days}</span><span class="cd-lbl">Tage</span></div>
+      <span class="cd-colon">:</span>`:'';
+    cdEl.innerHTML=`<div class="countdown-wrap"><div class="cd-inner">
+      <div class="cd-rule">
+        <span class="cd-rule-line"></span>
+        <span class="cd-rule-sym">✦ Nächster Gottesdienst ✦</span>
+        <span class="cd-rule-line r"></span>
+      </div>
+      <div class="cd-title">${ev.title}</div>
+      <span class="cd-type">${ev.type}</span>
+      <div class="cd-digits">
+        ${dayBlock}
+        <div class="cd-block"><span class="cd-num">${pad(hrs)}</span><span class="cd-lbl">Stunden</span></div>
+        <span class="cd-colon">:</span>
+        <div class="cd-block"><span class="cd-num">${pad(mins)}</span><span class="cd-lbl">Minuten</span></div>
+        <span class="cd-colon">:</span>
+        <div class="cd-block"><span class="cd-num">${pad(secs)}</span><span class="cd-lbl">Sekunden</span></div>
+      </div>
+      <div class="cd-divider"></div>
+      <div class="cd-date">${dateStr}</div>
+    </div></div>`;
+  }
+  clearInterval(countdownInterval);
+  tick();
+  countdownInterval=setInterval(tick,1000);
+}
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded',()=>{
+  setDailyVerse();
+  detectSeason();
+  initBell();
+  // Live-Uhr
+  function tickClock(){
+    const now=new Date();
+    const h=String(now.getHours()).padStart(2,'0');
+    const m=String(now.getMinutes()).padStart(2,'0');
+    const s=String(now.getSeconds()).padStart(2,'0');
+    const el=document.getElementById('liveClock');
+    if(el) el.textContent=h+':'+m+':'+s;
+  }
+  tickClock();
+  setInterval(tickClock,1000);
+  const n=new Date(),pad=x=>String(x).padStart(2,'0');
+  const today=`${n.getFullYear()}-${pad(n.getMonth()+1)}-${pad(n.getDate())}`;
+  ['cDate','nwDate','glDate','miDate'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=today;});
+  // Daten von API laden
+  loadFromAPI();
+  // Gespeichertes Token: Auto-Login prüfen
+  if(authToken){
+    api('load').then(data=>{
+      Object.assign(S,data);
+      if(data.nextId) nid=data.nextId;
+      // Prüfe ob Token noch gültig (login würde 401 geben, load ist public)
+    }).catch(()=>{});
+  }
+});
+</script>
+</body>
+</html>
